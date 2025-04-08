@@ -2,11 +2,32 @@ import os
 import sqlite3
 import hashlib
 from datetime import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, url_for, flash, g, session, abort, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from slugify import slugify
 import uuid
+import threading
+import time
+import requests
+import socket
+
+# Function to get local IP address
+def get_local_ip():
+    """Get the local IP address of the machine."""
+    try:
+        # Create a socket connection to determine the local IP address
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Doesn't need to be reachable
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        # Fallback to localhost if unable to determine IP
+        return '127.0.0.1'
 
 # Create and configure app
 app = Flask(__name__, 
@@ -25,6 +46,19 @@ os.makedirs(os.path.dirname(app.config['DATABASE']), exist_ok=True)
 
 # Create upload directory if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+
+# Configure logging
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler = RotatingFileHandler('logs/app.log', maxBytes=10000000, backupCount=5)
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+# Log some initial information
+app.logger.info('Application started')
 
 # Helper function to check if file has allowed extension
 def allowed_file(filename):
@@ -1158,6 +1192,49 @@ def admin_mark_message_read(id):
     flash('Message marked as read.', 'success')
     return redirect(url_for('admin_messages'))
 
+@app.route('/admin/logger')
+@admin_required
+def admin_logger():
+    """View application logs."""
+    log_files = {
+        'app.log': 'Application Logs',
+        'gunicorn-access.log': 'Gunicorn Access Logs',
+        'gunicorn-error.log': 'Gunicorn Error Logs'
+    }
+    
+    selected_log = request.args.get('log', 'app.log')
+    logs = []
+    
+    if selected_log in log_files:
+        log_path = os.path.join('logs', selected_log)
+        if os.path.exists(log_path):
+            try:
+                with open(log_path, 'r') as f:
+                    # Read last 1000 lines of logs
+                    lines = f.readlines()[-1000:]
+                    
+                    # Format logs based on the type
+                    if selected_log == 'gunicorn-access.log':
+                        # Format: IP - - [timestamp] "METHOD /path HTTP/1.1" status_code size
+                        logs = [f"{line.split('[')[1].split(']')[0]} - {line.split('\"')[1]} - Status: {line.split('\" ')[1].split(' ')[0]}" 
+                               for line in lines]
+                    elif selected_log == 'gunicorn-error.log':
+                        # Keep error logs as is, they're already well formatted
+                        logs = lines
+                    else:
+                        # Application logs
+                        logs = lines
+            except Exception as e:
+                error_msg = f"Error reading log file: {str(e)}"
+                logs = [error_msg]
+        else:
+            logs = ["No logs found"]
+    
+    return render_template('admin/logger.html', 
+                         logs=logs, 
+                         log_files=log_files,
+                         selected_log=selected_log)
+
 # File upload routes
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -1187,11 +1264,13 @@ def serve_image(subpath, filename):
 def upload_file():
     """Handle file uploads for projects, blogs, etc."""
     if 'file' not in request.files:
+        app.logger.warning('File upload attempted with no file')
         return jsonify({'error': 'No file part'}), 400
         
     file = request.files['file']
     
     if file.filename == '':
+        app.logger.warning('File upload attempted with empty filename')
         return jsonify({'error': 'No selected file'}), 400
         
     if file and allowed_file(file.filename):
@@ -1203,6 +1282,8 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(file_path)
         
+        app.logger.info(f'File uploaded successfully: {unique_filename}')
+        
         # Return the file path to be stored in the database
         relative_path = f"img/uploads/{unique_filename}"
         
@@ -1213,6 +1294,7 @@ def upload_file():
             'url': url_for('uploaded_file', filename=unique_filename)
         })
     
+    app.logger.warning(f'Invalid file type attempted: {file.filename}')
     return jsonify({'error': 'File type not allowed'}), 400
 
 # Add a route to serve PDF files for viewing in the browser
@@ -1220,5 +1302,35 @@ def upload_file():
 def view_certificate(filename):
     return send_from_directory(os.path.join('static', 'img', 'uploads'), filename)
 
+def keep_alive():
+    """Function to make recursive calls to keep the website alive."""
+    # Get local IP address
+    local_ip = get_local_ip()
+    base_url = f"http://{local_ip}:5000"
+    app.logger.info(f"Keep-alive service started, pinging {base_url}/alive every 15 minutes")
+    
+    while True:
+        try:
+            response = requests.get(f"{base_url}/alive")
+            app.logger.info(f"Keep-alive ping successful: {response.status_code}")
+        except Exception as e:
+            app.logger.error(f"Keep-alive ping failed: {str(e)}")
+        
+        # Sleep for 15 minutes
+        time.sleep(900)  # 900 seconds = 15 minutes
+
+@app.route('/alive')
+def alive():
+    """Route to check if the website is alive."""
+    app.logger.info("Alive check received")
+    return jsonify({"status": "alive", "timestamp": datetime.now().isoformat()})
+
+# Start the keep-alive thread when the application starts
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+    # Start the keep-alive thread
+    keep_alive_thread = threading.Thread(target=keep_alive, daemon=True)
+    keep_alive_thread.start()
+    
+    # Only enable debug mode when running directly with Python
+    # This prevents automatic reloading when running with Gunicorn
+    app.run(host='0.0.0.0', port=5000, debug=False) 

@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+
+# Unnecessary project files
+run.py
+models.py
+config.py
+app/
+routes/
+
+# Logs
+logs/*
+!logs/.gitkeep
+
+# Database
+instance/portfolio.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+.dockerignore 

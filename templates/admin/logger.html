@@ -1,0 +1,107 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Application Logs{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Application Logs</h1>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">{{ log_files[selected_log] }}</h6>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="logFileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select Log File
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="logFileDropdown">
+                    {% for log_file, log_name in log_files.items() %}
+                    <li>
+                        <a class="dropdown-item {% if log_file == selected_log %}active{% endif %}" 
+                           href="{{ url_for('admin_logger', log=log_file) }}">
+                            {{ log_name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="logsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            {% if selected_log == 'gunicorn-access.log' %}
+                            <th>Timestamp</th>
+                            <th>Request</th>
+                            <th>Status</th>
+                            {% else %}
+                            <th width="20%">Timestamp</th>
+                            <th width="10%">Level</th>
+                            <th>Message</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            {% if selected_log == 'gunicorn-access.log' %}
+                                {% set parts = log.split(' - ') %}
+                                <td>{{ parts[0] }}</td>
+                                <td>{{ parts[1] }}</td>
+                                <td>
+                                    {% set status = parts[2].split(': ')[1] | int %}
+                                    <span class="badge bg-{{ 'success' if status < 400 else 'warning' if status < 500 else 'danger' }}">
+                                        {{ status }}
+                                    </span>
+                                </td>
+                            {% else %}
+                                {% if ' - ' in log %}
+                                    {% set timestamp = log.split(' - ')[0] %}
+                                    {% set message = log.split(' - ', 1)[1] %}
+                                {% else %}
+                                    {% set timestamp = '' %}
+                                    {% set message = log %}
+                                {% endif %}
+                                <td>{{ timestamp }}</td>
+                                <td>
+                                    {% if 'ERROR' in log %}
+                                        <span class="badge bg-danger">ERROR</span>
+                                    {% elif 'WARNING' in log %}
+                                        <span class="badge bg-warning">WARNING</span>
+                                    {% elif 'INFO' in log %}
+                                        <span class="badge bg-info">INFO</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">DEBUG</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ message }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"/>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#logsTable').DataTable({
+            "order": [[ 0, "desc" ]],
+            "pageLength": 50,
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "responsive": true,
+            "autoWidth": false
+        });
+    });
+</script>
+{% endblock %} 
