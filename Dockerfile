@@ -31,4 +31,4 @@ ENV FLASK_ENV=production
 EXPOSE 5000
 
 # Command to run the application
-CMD ["gunicorn","-c", "gunicorn.conf.py", "-b", "0.0.0.0:5000", "app_sqlite:app"] 
+CMD ["gunicorn","-c", "gunicorn_config.py", "-b", "0.0.0.0:5000", "app_sqlite:app"] 
