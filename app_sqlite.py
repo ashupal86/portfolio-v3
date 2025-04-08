@@ -892,6 +892,58 @@ def admin_add_skill():
         
     return render_template('admin/skill_form.html')
 
+@app.route('/admin/skills/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_skill(id):
+    """Edit an existing skill."""
+    db = get_db()
+    skill = db.execute('SELECT * FROM Skill WHERE id = ?', (id,)).fetchone()
+    
+    if skill is None:
+        flash('Skill not found.', 'danger')
+        return redirect(url_for('admin_skills'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        category = request.form.get('category')
+        proficiency = request.form.get('proficiency')
+        icon = request.form.get('icon')
+        display_order = request.form.get('display_order', 0)
+        
+        if not all([name, category, proficiency]):
+            flash('Name, category, and proficiency are required.', 'warning')
+            return redirect(url_for('admin_edit_skill', id=id))
+            
+        db.execute(
+            '''UPDATE Skill 
+               SET name = ?, category = ?, proficiency = ?, icon = ?, display_order = ?
+               WHERE id = ?''',
+            (name, category, proficiency, icon, display_order, id)
+        )
+        db.commit()
+        
+        flash('Skill updated successfully.', 'success')
+        return redirect(url_for('admin_skills'))
+        
+    return render_template('admin/skill_form.html', skill=skill)
+
+@app.route('/admin/skills/<int:id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_skill(id):
+    """Delete a skill."""
+    db = get_db()
+    skill = db.execute('SELECT * FROM Skill WHERE id = ?', (id,)).fetchone()
+    
+    if skill is None:
+        flash('Skill not found.', 'danger')
+        return redirect(url_for('admin_skills'))
+        
+    db.execute('DELETE FROM Skill WHERE id = ?', (id,))
+    db.commit()
+    
+    flash('Skill deleted successfully.', 'success')
+    return redirect(url_for('admin_skills'))
+
 @app.route('/admin/projects')
 @admin_required
 def admin_projects():
@@ -976,16 +1028,16 @@ def admin_edit_project(id):
 def admin_delete_project(id):
     """Delete a project."""
     db = get_db()
-    # Check if project exists
     project = db.execute('SELECT * FROM Project WHERE id = ?', (id,)).fetchone()
     
     if project is None:
         flash('Project not found.', 'danger')
-    else:
-        db.execute('DELETE FROM Project WHERE id = ?', (id,))
-        db.commit()
-        flash('Project deleted successfully.', 'success')
+        return redirect(url_for('admin_projects'))
+        
+    db.execute('DELETE FROM Project WHERE id = ?', (id,))
+    db.commit()
     
+    flash('Project deleted successfully.', 'success')
     return redirect(url_for('admin_projects'))
 
 @app.route('/admin/blog')
@@ -1096,16 +1148,16 @@ def admin_edit_blog_post(id):
 def admin_delete_blog_post(id):
     """Delete a blog post."""
     db = get_db()
-    # Check if blog post exists
-    post = db.execute('SELECT * FROM BlogPost WHERE id = ?', (id,)).fetchone()
+    blog_post = db.execute('SELECT * FROM BlogPost WHERE id = ?', (id,)).fetchone()
     
-    if post is None:
+    if blog_post is None:
         flash('Blog post not found.', 'danger')
-    else:
-        db.execute('DELETE FROM BlogPost WHERE id = ?', (id,))
-        db.commit()
-        flash('Blog post deleted successfully.', 'success')
+        return redirect(url_for('admin_blog'))
+        
+    db.execute('DELETE FROM BlogPost WHERE id = ?', (id,))
+    db.commit()
     
+    flash('Blog post deleted successfully.', 'success')
     return redirect(url_for('admin_blog'))
 
 @app.route('/admin/achievements')
@@ -1240,16 +1292,16 @@ def admin_edit_achievement(id):
 def admin_delete_achievement(id):
     """Delete an achievement."""
     db = get_db()
-    # Check if achievement exists
     achievement = db.execute('SELECT * FROM Achievement WHERE id = ?', (id,)).fetchone()
     
     if achievement is None:
         flash('Achievement not found.', 'danger')
-    else:
-        db.execute('DELETE FROM Achievement WHERE id = ?', (id,))
-        db.commit()
-        flash('Achievement deleted successfully.', 'success')
+        return redirect(url_for('admin_achievements'))
+        
+    db.execute('DELETE FROM Achievement WHERE id = ?', (id,))
+    db.commit()
     
+    flash('Achievement deleted successfully.', 'success')
     return redirect(url_for('admin_achievements'))
 
 @app.route('/admin/messages')
