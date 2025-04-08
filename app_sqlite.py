@@ -675,16 +675,59 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/auth/reset-admin-password', methods=['GET', 'POST'])
+def reset_admin_password():
+    """Reset admin password."""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not all([username, current_password, new_password, confirm_password]):
+            flash('Please fill out all fields', 'warning')
+            return redirect(url_for('reset_admin_password'))
+        
+        if new_password != confirm_password:
+            flash('New passwords do not match!', 'danger')
+            return redirect(url_for('reset_admin_password'))
+        
+        db = get_db()
+        user = db.execute('SELECT * FROM User WHERE username = ?', (username,)).fetchone()
+        
+        if not user:
+            flash('User not found!', 'danger')
+            return redirect(url_for('reset_admin_password'))
+        
+        if not check_password_hash(user['password'], current_password):
+            flash('Current password is incorrect!', 'danger')
+            return redirect(url_for('reset_admin_password'))
+        
+        try:
+            db.execute(
+                'UPDATE User SET password = ? WHERE username = ?',
+                (generate_password_hash(new_password), username)
+            )
+            db.commit()
+            flash('Password updated successfully!', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.rollback()
+            flash(f'Error updating password: {str(e)}', 'danger')
+            return redirect(url_for('reset_admin_password'))
+    
+    return render_template('auth/reset_admin_password.html')
+
 @app.route('/auth/create-admin', methods=['GET', 'POST'])
 def create_admin():
-    """Create the first admin user."""
+    """Create a new admin user."""
     db = get_db()
     
     # Check if an admin already exists
     admin_exists = db.execute('SELECT COUNT(*) as count FROM User WHERE is_admin = 1').fetchone()['count'] > 0
     
     if admin_exists:
-        flash('Admin user already exists!', 'danger')
+        flash('Admin user already exists! Please login first to create additional admin users.', 'warning')
         return redirect(url_for('login'))
     
     if request.method == 'POST':
@@ -716,6 +759,42 @@ def create_admin():
         return redirect(url_for('login'))
     
     return render_template('auth/create_admin.html')
+
+@app.route('/auth/add-admin', methods=['GET', 'POST'])
+@admin_required
+def add_admin():
+    """Add additional admin users when logged in as admin."""
+    db = get_db()
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not all([username, password, confirm_password]):
+            flash('All fields are required', 'warning')
+            return redirect(url_for('add_admin'))
+        
+        if password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('add_admin'))
+        
+        # Check if username exists
+        if db.execute('SELECT id FROM User WHERE username = ?', (username,)).fetchone():
+            flash('Username already exists!', 'danger')
+            return redirect(url_for('add_admin'))
+        
+        # Create user
+        db.execute(
+            'INSERT INTO User (username, password, is_admin) VALUES (?, ?, 1)',
+            (username, generate_password_hash(password))
+        )
+        db.commit()
+        
+        flash('New admin user created successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('auth/add_admin.html')
 
 @app.route('/admin')
 @admin_required
@@ -1216,8 +1295,15 @@ def admin_logger():
                     # Format logs based on the type
                     if selected_log == 'gunicorn-access.log':
                         # Format: IP - - [timestamp] "METHOD /path HTTP/1.1" status_code size
-                        logs = [f"{line.split('[')[1].split(']')[0]} - {line.split('\"')[1]} - Status: {line.split('\" ')[1].split(' ')[0]}" 
-                               for line in lines]
+                        logs = []
+                        for line in lines:
+                            try:
+                                timestamp = line.split('[')[1].split(']')[0]
+                                request = line.split('"')[1]
+                                status = line.split('" ')[1].split(' ')[0]
+                                logs.append(f"{timestamp} - {request} - Status: {status}")
+                            except IndexError:
+                                logs.append(line)
                     elif selected_log == 'gunicorn-error.log':
                         # Keep error logs as is, they're already well formatted
                         logs = lines

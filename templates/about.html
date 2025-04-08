@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-header">
+                <h2 class="bangers-font">About Me</h2>
+                <div class="section-divider"></div>
+            </div>
+            
+            <div class="about-text">
+                {{ about.content|safe }}
+            </div>
+
+            <div class="about-highlights">
+                <div class="highlight-card">
+                    <h3><i class="fas fa-code me-2"></i>Development</h3>
+                    <p>Full stack developer with expertise in modern web technologies and frameworks.</p>
+                </div>
+                
+                <div class="highlight-card">
+                    <h3><i class="fas fa-laptop-code me-2"></i>Technologies</h3>
+                    <p>Proficient in Python, JavaScript, React, Flask, and various other technologies.</p>
+                </div>
+                
+                <div class="highlight-card">
+                    <h3><i class="fas fa-project-diagram me-2"></i>Problem Solving</h3>
+                    <p>Strong analytical and problem-solving skills with attention to detail.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

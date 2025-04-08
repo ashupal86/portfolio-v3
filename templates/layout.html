@@ -50,7 +50,7 @@
                         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='about') }}">About</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#about">About</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index', _anchor='skills') }}">Skills</a>
@@ -147,5 +147,29 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
     {% block extra_js %}{% endblock %}
+    <script>
+        document.querySelectorAll('a.nav-link').forEach(link => {
+          link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+              e.preventDefault();
+              const target = document.querySelector(href);
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+          });
+        });
+        document.querySelectorAll('a.nav-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+              const href = this.getAttribute('href');
+              if (href.startsWith('/#') && window.location.pathname !== '/') {
+                e.preventDefault();
+                window.location.href = href;
+              }
+            });
+          });
+      </script>
+      
 </body>
 </html> 

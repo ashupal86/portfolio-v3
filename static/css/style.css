@@ -18,10 +18,27 @@
 
 /* Base Styles */
 body {
+    background-image: url('../img/Gemini_Generated_Image_z3yqisz3yqisz3yq.jpg');
     background-color: var(--bg-color);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text-color);
     font-family: 'Source Code Pro', monospace;
     line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: -1;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -213,14 +230,88 @@ a:hover {
 }
 
 /* About section */
-.about-terminal {
-    min-height: 300px;
-    padding: 1rem;
+.about-section {
     position: relative;
+    padding: 4rem 0;
 }
 
-.about-terminal .terminal-prompt {
-    display: inline-block;
+.about-content {
+    background: rgba(20, 20, 20, 0.85);
+    border-radius: 15px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+}
+
+.about-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.about-header h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 0.05em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.about-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+}
+
+.about-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.highlight-card {
+    background: rgba(30, 30, 30, 0.6);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.highlight-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.highlight-card h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.highlight-card p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Typewriter effect for homepage */
+.typewriter {
+    border-right: 0.15em solid var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0 auto;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--primary-color) }
 }
 
 /* Skills section - Minimal Design */

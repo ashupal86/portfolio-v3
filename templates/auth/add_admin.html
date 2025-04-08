@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Admin User{% endblock %}
+
+{% block content %}
+<section class="create-admin-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="comic-panel login-panel">
+                    <h1 class="bangers-font text-center mb-4">Add New Admin User</h1>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="terminal-box mb-4">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <span class="terminal-btn red"></span>
+                                <span class="terminal-btn yellow"></span>
+                                <span class="terminal-btn green"></span>
+                            </div>
+                            <div class="terminal-title">add_admin_user.sh</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-text">
+                                <p>$ sudo -u {{ current_user.username }}</p>
+                                <p>$ echo "Creating additional administrator account..."</p>
+                                <p>$ sudo useradd -G admin</p>
+                                <p>$ _</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('add_admin') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" required autofocus>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                    <i class="fas fa-eye" id="toggleConfirmIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i> Add Admin User
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary mt-2">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password visibility toggles
+        const toggleButtons = {
+            password: {
+                button: document.getElementById('togglePassword'),
+                input: document.getElementById('password'),
+                icon: document.getElementById('toggleIcon')
+            },
+            confirm: {
+                button: document.getElementById('toggleConfirmPassword'),
+                input: document.getElementById('confirm_password'),
+                icon: document.getElementById('toggleConfirmIcon')
+            }
+        };
+        
+        Object.values(toggleButtons).forEach(({button, input, icon}) => {
+            if (button && input && icon) {
+                button.addEventListener('click', function() {
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    
+                    // Toggle icon
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    });
+</script>
+{% endblock %} 
