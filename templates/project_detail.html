@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ project.title }} - Project Details{% endblock %}
+
+{% block content %}
+<section class="project-detail-section py-5">
+    <div class="container">
+        <div class="comic-panel p-0 overflow-hidden animate-on-scroll">
+            <!-- Hero Section -->
+            <div class="project-hero position-relative">
+                {% if project.image %}
+                    <div class="project-image-container">
+                        <img src="{{ url_for('static', filename=project.image) }}" 
+                             alt="{{ project.title }}" class="project-hero-img">
+                    </div>
+                {% else %}
+                    <div class="project-hero-placeholder d-flex align-items-center justify-content-center">
+                        <i class="fas fa-code fa-5x text-primary"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Project Title Overlay -->
+                <div class="project-title-overlay">
+                    <div class="container">
+                        <h1 class="bangers-font display-4">{{ project.title }}</h1>
+                        <div class="d-flex flex-wrap">
+                            {% if project.category %}
+                                <span class="badge bg-primary me-2">{{ project.category }}</span>
+                            {% endif %}
+                            {% if project.featured %}
+                                <span class="badge bg-success">Featured Project</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="project-content p-4 p-md-5">
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mb-4">
+                    <a href="{{ url_for('projects') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Projects
+                    </a>
+                    <div>
+                        {% if project.url %}
+                            <a href="{{ project.url }}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt me-1"></i> Live Demo
+                            </a>
+                        {% endif %}
+                        {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" class="btn btn-dark ms-2">
+                                <i class="fab fa-github me-1"></i> View Code
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Project Description -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="terminal-box mb-4">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="terminal-btn red"></span>
+                                    <span class="terminal-btn yellow"></span>
+                                    <span class="terminal-btn green"></span>
+                                </div>
+                                <div class="terminal-title">description.md</div>
+                            </div>
+                            <div class="terminal-body p-4">
+                                <h3 class="bangers-font mb-3">About This Project</h3>
+                                <div class="project-description">
+                                    {{ project.description | nl2br | safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Technologies Used -->
+                        <div class="comic-panel mb-4">
+                            <h3 class="bangers-font mb-3">Technologies</h3>
+                            <div class="d-flex flex-wrap">
+                                {% if project.technologies %}
+                                    {% for tech in project.technologies.split(',') %}
+                                        <span class="tech-badge">{{ tech.strip() }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No technologies specified</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Project Links -->
+                        <div class="comic-panel mb-4">
+                            <h3 class="bangers-font mb-3">Project Links</h3>
+                            <ul class="list-group list-group-flush">
+                                {% if project.url %}
+                                    <li class="list-group-item bg-transparent">
+                                        <i class="fas fa-globe text-primary me-2"></i>
+                                        <a href="{{ project.url }}" target="_blank" class="text-decoration-none">
+                                            Live Demo
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <li class="list-group-item bg-transparent">
+                                        <i class="fab fa-github text-primary me-2"></i>
+                                        <a href="{{ project.github_url }}" target="_blank" class="text-decoration-none">
+                                            GitHub Repository
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                <li class="list-group-item bg-transparent">
+                                    <i class="fas fa-calendar text-primary me-2"></i>
+                                    Created: {{ project.created_at | datetime }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Related Projects -->
+                {% if related_projects %}
+                    <div class="related-projects mt-5">
+                        <h2 class="bangers-font mb-4">Related Projects</h2>
+                        <div class="row">
+                            {% for related in related_projects %}
+                                <div class="col-md-4 mb-4">
+                                    <div class="project-card h-100">
+                                        <a href="{{ url_for('project_detail', id=related.id) }}" class="project-card-link">
+                                            {% if related.image %}
+                                                <img src="{{ url_for('static', filename=related.image) }}" 
+                                                    alt="{{ related.title }}" class="project-img">
+                                            {% else %}
+                                                <div class="project-img d-flex align-items-center justify-content-center bg-dark">
+                                                    <i class="fas fa-code fa-3x text-primary"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="project-content p-3">
+                                                <h3 class="bangers-font h5">{{ related.title }}</h3>
+                                                <div class="project-category mb-2">
+                                                    <span class="badge bg-primary">{{ related.category }}</span>
+                                                </div>
+                                                <p class="small">{{ related.description[:100] }}{% if related.description|length > 100 %}...{% endif %}</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section class="login-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="comic-panel login-panel">
+                    <h1 class="bangers-font text-center mb-4">Admin Login</h1>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="terminal-box mb-4">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <span class="terminal-btn red"></span>
+                                <span class="terminal-btn yellow"></span>
+                                <span class="terminal-btn green"></span>
+                            </div>
+                            <div class="terminal-title">authenticate.sh</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="typewriter-text" id="loginTypewriter">
+                                <span class="typed-text">Welcome to the Admin Terminal.</span>
+                                <span class="typed-text">Please authenticate to continue...</span>
+                                <span class="typed-cursor">█</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('auth_bp.login') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" required autofocus>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i> Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (togglePassword && password && toggleIcon) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle icon
+                toggleIcon.classList.toggle('fa-eye');
+                toggleIcon.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Terminal typing effect
+        const typewriterElement = document.getElementById('loginTypewriter');
+        if (typewriterElement) {
+            const textElements = typewriterElement.querySelectorAll('.typed-text');
+            const cursor = typewriterElement.querySelector('.typed-cursor');
+            
+            let textIndex = 0;
+            let charIndex = 0;
+            
+            function typeText() {
+                if (textIndex < textElements.length) {
+                    const currentText = textElements[textIndex].textContent;
+                    
+                    if (charIndex < currentText.length) {
+                        textElements[textIndex].innerHTML = currentText.substring(0, charIndex + 1);
+                        charIndex++;
+                        setTimeout(typeText, 50);
+                    } else {
+                        charIndex = 0;
+                        textIndex++;
+                        setTimeout(typeText, 1000);
+                    }
+                }
+            }
+            
+            // Reset all text content
+            textElements.forEach(el => {
+                el.textContent = el.textContent;
+                el.innerHTML = '';
+            });
+            
+            // Start typing effect
+            setTimeout(typeText, 500);
+            
+            // Cursor blinking
+            setInterval(() => {
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }, 500);
+        }
+    });
+</script>
+{% endblock %} 

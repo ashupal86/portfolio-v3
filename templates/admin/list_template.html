@@ -1,0 +1,193 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="admin-list">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="bangers-font">{{ title }}</h1>
+        <a href="{{ add_url }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i> Add {{ item_name }}
+        </a>
+    </div>
+    
+    <div class="comic-panel">
+        {% if items %}
+            <div class="terminal-box">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="terminal-btn red"></span>
+                        <span class="terminal-btn yellow"></span>
+                        <span class="terminal-btn green"></span>
+                    </div>
+                    <div class="terminal-title">{{ list_title|default('list_items.log') }}</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped table-bordered table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    {% for col in columns %}
+                                        <th scope="col">{{ col.label }}</th>
+                                    {% endfor %}
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                    <tr>
+                                        {% for col in columns %}
+                                            <td>
+                                                {% if col.type == 'image' and item[col.key] %}
+                                                    <img src="{{ url_for('static', filename=item[col.key]) }}" 
+                                                         alt="{{ item.title|default('Image') }}" class="list-image">
+                                                {% elif col.type == 'date' and item[col.key] %}
+                                                    {{ item[col.key]|format_date }}
+                                                {% elif col.type == 'datetime' and item[col.key] %}
+                                                    {{ item[col.key]|format_datetime }}
+                                                {% elif col.type == 'boolean' %}
+                                                    {% if item[col.key] %}
+                                                        <span class="badge bg-success">Yes</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">No</span>
+                                                    {% endif %}
+                                                {% elif col.type == 'truncate' %}
+                                                    {{ item[col.key]|striptags|truncate(col.length|default(50)) }}
+                                                {% elif col.type == 'badge' %}
+                                                    <span class="badge bg-{{ col.color|default('primary') }}">{{ item[col.key] }}</span>
+                                                {% else %}
+                                                    {{ item[col.key]|default('-') }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                        <td class="table-actions">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for(edit_endpoint, id=item.id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.id }}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                {% if view_endpoint %}
+                                                    <a href="{{ url_for(view_endpoint, id=item.id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if extra_buttons %}
+                                                    {% for btn in extra_buttons %}
+                                                        <a href="{{ url_for(btn.endpoint, id=item.id) }}" 
+                                                           class="btn btn-sm btn-{{ btn.color|default('secondary') }}" 
+                                                           title="{{ btn.title }}">
+                                                            <i class="fas fa-{{ btn.icon }}"></i>
+                                                        </a>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Delete Modal -->
+                                            <div class="modal fade" id="deleteModal{{ item.id }}" tabindex="-1" 
+                                                 aria-labelledby="deleteModalLabel{{ item.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deleteModalLabel{{ item.id }}">
+                                                                Delete {{ item_name }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to delete this {{ item_name.lower() }}?</p>
+                                                            <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+                                                            
+                                                            <div class="item-details mt-3">
+                                                                {% for col in columns if loop.index <= 2 %}
+                                                                    <p><strong>{{ col.label }}:</strong> 
+                                                                        {% if col.type == 'truncate' %}
+                                                                            {{ item[col.key]|striptags|truncate(col.length|default(50)) }}
+                                                                        {% else %}
+                                                                            {{ item[col.key]|default('-') }}
+                                                                        {% endif %}
+                                                                    </p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <form action="{{ url_for(delete_endpoint, id=item.id) }}" method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if pagination and pagination.pages > 1 %}
+                <div class="mt-4 d-flex justify-content-center">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for(pagination.endpoint, page=pagination.prev_num) if pagination.has_prev else '#' }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for(pagination.endpoint, page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">...</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for(pagination.endpoint, page=pagination.next_num) if pagination.has_next else '#' }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-{{ empty_icon|default('file-alt') }} fa-5x mb-3 text-muted"></i>
+                <h3 class="bangers-font">No {{ item_name_plural|default(item_name + 's') }} Found</h3>
+                <p class="text-muted">Get started by adding your first {{ item_name.lower() }}.</p>
+                <a href="{{ add_url }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus-circle me-2"></i> Add {{ item_name }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .list-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .table-actions .btn-group {
+        white-space: nowrap;
+    }
+</style>
+{% endblock %} 

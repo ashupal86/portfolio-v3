@@ -1,0 +1,402 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="section hero">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="bangers-font animate-on-scroll">Welcome to My Comic Portfolio</h1>
+            <p class="hero-subtitle animate-on-scroll">Full Stack Web Developer & Terminal Enthusiast</p>
+            <div class="d-flex justify-content-center mt-4 animate-on-scroll">
+                <a href="#about" class="btn btn-primary me-3 nav-link">
+                    <i class="fas fa-user me-2"></i> About Me
+                </a>
+                <a href="#projects" class="btn btn-outline-primary nav-link">
+                    <i class="fas fa-code me-2"></i> My Projects
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">About Me</h2>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="terminal-box about-terminal">
+                    <div class="terminal-text">
+                        {% if about %}
+                            {{ about.content|safe }}
+                        {% else %}
+                            Hi, I'm a Full Stack Developer with a passion for creating elegant, efficient, and user-friendly web applications. I specialize in Python/Flask, JavaScript, and modern front-end frameworks.
+                            
+                            With a background in computer science and several years of professional experience, I've developed a keen eye for detail and a commitment to writing clean, maintainable code.
+                            
+                            When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or enjoying a good sci-fi novel.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">My Skills</h2>
+        
+        {% if skills_by_category %}
+            <div class="skills-container">
+                {% for category, skills in skills_by_category.items() %}
+                    <div class="skill-category mb-5 animate-on-scroll">
+                        <h3 class="bangers-font mb-4">{{ category }}</h3>
+                        <div class="skills-tag-container">
+                            {% for skill in skills %}
+                                <div class="skill-tag" data-proficiency="{{ skill.proficiency }}">
+                                    {% if skill.icon %}<i class="{{ skill.icon }} me-2"></i>{% endif %}
+                                    {{ skill.name }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="comic-panel text-center">
+                <p>Skills will be added soon!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">My Projects</h2>
+        
+        <!-- Featured Projects -->
+        {% if featured_projects %}
+            <h3 class="bangers-font mb-4">Featured Projects</h3>
+            <div class="row">
+                {% for project in featured_projects %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="project-card animate-on-scroll">
+                            <a href="{{ url_for('project_detail', id=project.id) }}" class="project-card-link">
+                                {% if project.image %}
+                                    <img src="{{ url_for('static', filename=project.image) }}" alt="{{ project.title }}" class="project-img">
+                                {% else %}
+                                    <div class="project-img d-flex align-items-center justify-content-center bg-dark">
+                                        <i class="fas fa-code fa-3x text-primary"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="project-content">
+                                    <h4>{{ project.title }}</h4>
+                                    <p>{{ project.description|truncate(100) }}</p>
+                                    <div class="d-flex flex-wrap mb-3">
+                                        {% for tech in project.technologies.split(',') %}
+                                            <span class="tech-badge">{{ tech.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="project-links">
+                                <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-sm btn-primary me-2">
+                                    <i class="fas fa-info-circle me-1"></i> Details
+                                </a>
+                                {% if project.url %}
+                                    <a href="{{ project.url }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-external-link-alt me-1"></i> Demo
+                                    </a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fab fa-github me-1"></i> Code
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Other Projects -->
+        {% if other_projects %}
+            <h3 class="bangers-font mb-4 mt-5">Other Projects</h3>
+            <div class="row">
+                {% for project in other_projects %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="project-card animate-on-scroll">
+                            <a href="{{ url_for('project_detail', id=project.id) }}" class="project-card-link">
+                                {% if project.image %}
+                                    <img src="{{ url_for('static', filename=project.image) }}" alt="{{ project.title }}" class="project-img">
+                                {% else %}
+                                    <div class="project-img d-flex align-items-center justify-content-center bg-dark">
+                                        <i class="fas fa-code fa-3x text-primary"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="project-content">
+                                    <h4>{{ project.title }}</h4>
+                                    <p>{{ project.description|truncate(100) }}</p>
+                                    <div class="d-flex flex-wrap mb-3">
+                                        {% for tech in project.technologies.split(',') %}
+                                            <span class="tech-badge">{{ tech.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="project-links">
+                                <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-sm btn-primary me-2">
+                                    <i class="fas fa-info-circle me-1"></i> Details
+                                </a>
+                                {% if project.url %}
+                                    <a href="{{ project.url }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-external-link-alt me-1"></i> Demo
+                                    </a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fab fa-github me-1"></i> Code
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% if not featured_projects and not other_projects %}
+            <div class="comic-panel text-center">
+                <p>Projects will be added soon!</p>
+            </div>
+        {% endif %}
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('projects') }}" class="btn btn-primary">
+                <i class="fas fa-project-diagram me-2"></i> View All Projects
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Achievements Section -->
+<section id="achievements" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">Achievements</h2>
+        
+        {% if achievements %}
+            <div class="row">
+                {% for achievement in achievements %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="achievement-card animate-on-scroll" data-achievement-id="{{ achievement.id }}">
+                            {% if achievement.image %}
+                                <div class="achievement-image-container">
+                                    <img src="{{ url_for('static', filename=achievement.image) }}" 
+                                         alt="{{ achievement.title }}" class="achievement-img">
+                                    {% if achievement.date %}
+                                        <div class="achievement-date-badge">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ achievement.date.strftime('%b %Y') }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="achievement-img-placeholder d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-trophy fa-3x text-primary"></i>
+                                    {% if achievement.date %}
+                                        <div class="achievement-date-badge">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ achievement.date.strftime('%b %Y') }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="achievement-content">
+                                <h4 class="achievement-title bangers-font">{{ achievement.title }}</h4>
+                                <p class="achievement-description">{{ achievement.description }}</p>
+                                {% if achievement.certificate_pdf %}
+                                    <div class="achievement-certificate mt-2">
+                                        <a href="{{ url_for('static', filename=achievement.certificate_pdf) }}" class="btn btn-sm btn-outline-primary" download>
+                                            <i class="fas fa-download"></i> Download Certificate
+                                        </a>
+                                        <a href="{{ url_for('view_certificate', filename=achievement.certificate_pdf.split('/')[-1]) }}" class="btn btn-sm btn-outline-info ms-2" target="_blank">
+                                            <i class="fas fa-eye"></i> View Certificate
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Achievement Modal (Single modal for all achievements) -->
+            <div class="modal fade" id="achievementModal" tabindex="-1" role="dialog" aria-labelledby="achievementModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title bangers-font" id="achievementModalTitle"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6" id="modalImageContainer">
+                                    <!-- Image will be inserted here via JavaScript -->
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="achievement-modal-description" id="modalDescription">
+                                        <!-- Description will be inserted here via JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="comic-panel text-center">
+                <p>Achievements will be added soon!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Education Section -->
+<section id="education" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">Education</h2>
+        
+        <div class="comic-panel">
+            {% if education %}
+                <div class="row">
+                    {% for edu in education %}
+                        <div class="col-lg-10 offset-lg-1">
+                            <div class="education-item animate-on-scroll">
+                                <div class="education-date">
+                                    {{ edu.start_date.strftime('%B %Y') }} - 
+                                    {% if edu.end_date %}
+                                        {{ edu.end_date.strftime('%B %Y') }}
+                                    {% else %}
+                                        Present
+                                    {% endif %}
+                                </div>
+                                <h4 class="bangers-font">{{ edu.institution }}</h4>
+                                <p class="education-degree">{{ edu.degree }} in {{ edu.field }}</p>
+                                {% if edu.description %}
+                                    <p>{{ edu.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center">
+                    <p>Education details will be added soon!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Blog Preview Section -->
+<section id="blog-preview" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">Latest Blog Posts</h2>
+        
+        {% if blog_posts %}
+            <div class="row">
+                {% for post in blog_posts %}
+                    <div class="col-md-4 mb-4">
+                        <div class="blog-card animate-on-scroll">
+                            {% if post.image %}
+                                <img src="{{ url_for('static', filename=post.image) }}" 
+                                     alt="{{ post.title }}" class="blog-img">
+                            {% else %}
+                                <div class="blog-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-newspaper fa-3x text-primary"></i>
+                                </div>
+                            {% endif %}
+                            <div class="blog-content">
+                                <div class="blog-date">
+                                    <i class="fas fa-calendar-alt me-1"></i> 
+                                    {{ post.created_at.strftime('%B %d, %Y') }}
+                                </div>
+                                <h4 class="blog-title">{{ post.title }}</h4>
+                                <p class="blog-excerpt">{{ post.content|striptags|truncate(120) }}</p>
+                                <a href="{{ url_for('blog_post', slug=post.slug) }}" class="btn btn-primary">
+                                    Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('blog') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-book me-2"></i> View All Posts
+                </a>
+            </div>
+        {% else %}
+            <div class="comic-panel text-center">
+                <p>Blog posts will be added soon!</p>
+                <a href="{{ url_for('blog') }}" class="btn btn-outline-primary mt-3">
+                    <i class="fas fa-book me-2"></i> Visit Blog
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="section" style="display: none;">
+    <div class="container">
+        <h2 class="section-title bangers-font text-center">Get In Touch</h2>
+        
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="comic-panel">
+                    <form id="contactForm" action="{{ url_for('contact') }}" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-contact">
+                                <i class="fas fa-paper-plane me-2"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- This block is intentionally left empty as modal functionality is now handled in main.js -->
+{% endblock %} 

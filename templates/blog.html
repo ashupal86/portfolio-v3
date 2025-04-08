@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+<section class="blog-section">
+    <div class="container py-5">
+        <h1 class="bangers-font text-center mb-5">Blog</h1>
+        
+        {% if blog_posts %}
+            <div class="row">
+                {% for post in blog_posts %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="blog-card animate-on-scroll">
+                            {% if post.image %}
+                                <img src="{{ url_for('static', filename=post.image) }}" 
+                                     alt="{{ post.title }}" class="blog-img">
+                            {% else %}
+                                <div class="blog-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-newspaper fa-3x text-primary"></i>
+                                </div>
+                            {% endif %}
+                            <div class="blog-content">
+                                <div class="blog-date">
+                                    <i class="fas fa-calendar-alt me-1"></i> 
+                                    {{ post.created_at.strftime('%B %d, %Y') }}
+                                </div>
+                                <h3 class="blog-title">{{ post.title }}</h3>
+                                <p class="blog-excerpt">{{ post.content|striptags|truncate(150) }}</p>
+                                <a href="{{ url_for('blog_post', slug=post.slug) }}" class="btn btn-primary">
+                                    Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+                <nav aria-label="Blog pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="{{ url_for('blog', page=pagination.prev_num) if pagination.has_prev else '#' }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        
+                        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('blog', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                            <a class="page-link" href="{{ url_for('blog', page=pagination.next_num) if pagination.has_next else '#' }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="comic-panel text-center p-5">
+                <i class="fas fa-newspaper fa-5x mb-4 text-primary"></i>
+                <h3 class="bangers-font">No Blog Posts Yet</h3>
+                <p>Blog posts will be added soon! Check back later.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} 

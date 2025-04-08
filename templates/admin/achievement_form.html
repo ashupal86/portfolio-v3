@@ -1,0 +1,215 @@
+{% extends "admin/layout.html" %}
+{% from "admin/components/image_uploader.html" import image_uploader %}
+
+{% block title %}{{ 'Edit' if achievement else 'Add' }} Achievement{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="bangers-font">{{ 'Edit' if achievement else 'Add' }} Achievement</h1>
+    <a href="{{ url_for('admin_achievements') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Achievements
+    </a>
+</div>
+
+<div class="comic-panel">
+    <!-- Alert container for upload errors -->
+    <div class="upload-alert-container"></div>
+    
+    <form method="POST" action="{{ url_for('admin_edit_achievement', id=achievement.id) if achievement else url_for('admin_add_achievement') }}" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Achievement Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ achievement.title if achievement else '' }}" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ achievement.date.strftime('%Y-%m-%d') if achievement and achievement.date else '' }}">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i> When this achievement was obtained.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4">{{ achievement.description if achievement else '' }}</textarea>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i> A brief description of this achievement.
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                {{ image_uploader('image', achievement.image if achievement else '', 'Achievement Image', 'Recommended size: 800x600px. Supported formats: JPG, PNG, GIF, SVG.') }}
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Certificate PDF (Optional)</label>
+            <div class="input-group">
+                <input type="file" class="form-control" id="certificateInput" accept=".pdf">
+                <button class="btn btn-outline-primary" type="button" id="uploadCertificateBtn">Upload</button>
+            </div>
+            <small class="text-muted">Upload a PDF certificate for this achievement</small>
+            
+            <div id="certificatePreview" class="mt-2 d-none">
+                <div class="pdf-preview">
+                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    <span id="certificateFilename" class="ms-2"></span>
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="removeCertificateBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <a id="viewCertificateLink" href="#" target="_blank" class="btn btn-sm btn-outline-info mt-2">
+                    <i class="fas fa-eye"></i> View Certificate
+                </a>
+            </div>
+            
+            <input type="hidden" id="certificate_pdf" name="certificate_pdf" value="{{ achievement.certificate_pdf if achievement and achievement.certificate_pdf else '' }}">
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> {{ 'Update' if achievement else 'Save' }} Achievement
+            </button>
+            {% if achievement %}
+                <button type="button" class="btn btn-danger ms-2" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteAchievementModal">
+                    <i class="fas fa-trash-alt me-2"></i> Delete Achievement
+                </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% if achievement %}
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteAchievementModal" tabindex="-1" 
+     aria-labelledby="deleteAchievementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAchievementModalLabel">
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the achievement <strong>{{ achievement.title }}</strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('admin_delete_achievement', id=achievement.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Achievement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Optional JavaScript for enhanced form functionality -->
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize certificate upload functionality
+        const certificateInput = document.getElementById('certificateInput');
+        const uploadCertificateBtn = document.getElementById('uploadCertificateBtn');
+        const certificatePreview = document.getElementById('certificatePreview');
+        const certificateFilename = document.getElementById('certificateFilename');
+        const removeCertificateBtn = document.getElementById('removeCertificateBtn');
+        const hiddenCertificateInput = document.getElementById('certificate_pdf');
+        const viewCertificateLink = document.getElementById('viewCertificateLink');
+        const uploadAlert = document.getElementById('uploadAlert');
+        
+        // Check if there's already a certificate
+        if (hiddenCertificateInput.value) {
+            const filename = hiddenCertificateInput.value.split('/').pop();
+            certificateFilename.textContent = filename;
+            certificatePreview.classList.remove('d-none');
+            viewCertificateLink.href = "{{ url_for('view_certificate', filename='') }}" + filename;
+        }
+        
+        // Handle certificate upload
+        uploadCertificateBtn.addEventListener('click', function() {
+            if (!certificateInput.files || certificateInput.files.length === 0) {
+                showUploadAlert('Please select a PDF file to upload');
+                return;
+            }
+            
+            const file = certificateInput.files[0];
+            if (!file.type.includes('pdf')) {
+                showUploadAlert('Only PDF files are allowed for certificates');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Show loading state
+            uploadCertificateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadCertificateBtn.disabled = true;
+            
+            // Upload the file
+            fetch('/admin/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showUploadAlert(data.error);
+                } else {
+                    // Update the hidden input with the file path
+                    hiddenCertificateInput.value = data.file_path;
+                    
+                    // Show the preview
+                    certificateFilename.textContent = file.name;
+                    certificatePreview.classList.remove('d-none');
+                    
+                    // Set the view link
+                    viewCertificateLink.href = data.url;
+                    
+                    // Clear the file input
+                    certificateInput.value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showUploadAlert('An error occurred during upload');
+            })
+            .finally(() => {
+                // Reset button state
+                uploadCertificateBtn.innerHTML = 'Upload';
+                uploadCertificateBtn.disabled = false;
+            });
+        });
+        
+        // Handle certificate removal
+        removeCertificateBtn.addEventListener('click', function() {
+            hiddenCertificateInput.value = '';
+            certificatePreview.classList.add('d-none');
+            certificateInput.value = '';
+        });
+        
+        // Show upload alert
+        function showUploadAlert(message) {
+            uploadAlert.textContent = message;
+            uploadAlert.classList.remove('d-none');
+            setTimeout(() => {
+                uploadAlert.classList.add('d-none');
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %} 

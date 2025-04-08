@@ -1,0 +1,22 @@
+{% macro image_uploader(name, value='', label='Image', help_text='Upload an image file (JPG, PNG, GIF, or SVG).') %}
+<div class="mb-3">
+    <label for="{{ name }}_file" class="form-label">{{ label }}</label>
+    <div class="image-uploader">
+        <div class="drop-area">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p>Click to upload or drag and drop</p>
+            <small class="text-muted">{{ help_text }}</small>
+        </div>
+        <input type="file" name="{{ name }}_file" id="{{ name }}_file" class="file-input" accept="image/*">
+        <input type="hidden" name="{{ name }}" id="{{ name }}" value="{{ value }}">
+        <div class="image-preview">
+            {% if value %}
+                <div class="preview-image-container">
+                    <img src="{{ url_for('static', filename=value) }}" alt="Uploaded image" class="preview-image">
+                    <button type="button" class="remove-image"><i class="fas fa-times"></i></button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endmacro %} 

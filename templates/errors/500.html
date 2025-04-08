@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<section class="error-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="comic-panel error-panel">
+                    <div class="comic-header">
+                        <h1 class="bangers-font error-code">500</h1>
+                    </div>
+                    
+                    <div class="terminal-box error-terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <span class="terminal-btn red"></span>
+                                <span class="terminal-btn yellow"></span>
+                                <span class="terminal-btn green"></span>
+                            </div>
+                            <div class="terminal-title">server_error.log</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-text">
+                                <p class="terminal-line">$ server_status</p>
+                                <p class="terminal-line error-message">Error: Internal Server Error!</p>
+                                <p class="terminal-line">$ echo "What happened?"</p>
+                                <p class="terminal-line response">The server encountered an unexpected condition that prevented it from fulfilling the request.</p>
+                                <p class="terminal-line">$ suggest_action</p>
+                                <p class="terminal-line response">Please try again later or contact the administrator if the problem persists.</p>
+                                <p class="terminal-line">$ _</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="error-actions text-center mt-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i> Back to Homepage
+                        </a>
+                        <a href="javascript:history.back()" class="btn btn-outline-primary ms-3">
+                            <i class="fas fa-arrow-left me-2"></i> Go Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-panel {
+        padding: 2rem;
+    }
+    
+    .comic-header {
+        position: relative;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        margin: 0;
+        color: var(--danger);
+        text-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+        animation: shake 0.5s ease-in-out 1s;
+    }
+    
+    .error-terminal {
+        margin-bottom: 2rem;
+    }
+    
+    .terminal-line {
+        margin-bottom: 0.5rem;
+        font-family: 'Roboto Mono', monospace;
+    }
+    
+    .error-message {
+        color: var(--danger);
+        font-weight: bold;
+    }
+    
+    .response {
+        color: var(--terminal-green);
+        margin-left: 1rem;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+</style>
+{% endblock %} 

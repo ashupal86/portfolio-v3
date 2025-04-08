@@ -1,0 +1,130 @@
+{% extends "admin/layout.html" %}
+{% from "admin/components/image_uploader.html" import image_uploader %}
+
+{% block title %}{{ 'Edit' if project else 'Add' }} Project{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="bangers-font">{{ 'Edit' if project else 'Add' }} Project</h1>
+    <a href="{{ url_for('admin_projects') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Projects
+    </a>
+</div>
+
+<div class="comic-panel">
+    <!-- Alert container for upload errors -->
+    <div class="upload-alert-container"></div>
+    
+    <form method="POST" action="{{ url_for('admin_edit_project', id=project.id) if project else url_for('admin_add_project') }}" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Project Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ project.title if project else '' }}" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <input type="text" class="form-control" id="category" name="category" value="{{ project.category if project else '' }}">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i> E.g., Web App, Mobile App, API, etc.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required>{{ project.description if project else '' }}</textarea>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i> A detailed description of the project.
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                {{ image_uploader('image', project.image if project else '', 'Project Image', 'Recommended size: 800x600px. Supported formats: JPG, PNG, GIF, SVG.') }}
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="technologies" class="form-label">Technologies</label>
+                    <input type="text" class="form-control" id="technologies" name="technologies" value="{{ project.technologies if project else '' }}" placeholder="HTML, CSS, JavaScript, Python, Flask">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i> Comma-separated list of technologies used.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="url" class="form-label">Live URL</label>
+                    <input type="url" class="form-control" id="url" name="url" value="{{ project.url if project else '' }}" placeholder="https://example.com">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="github_url" class="form-label">GitHub URL</label>
+                    <input type="url" class="form-control" id="github_url" name="github_url" value="{{ project.github_url if project else '' }}" placeholder="https://github.com/username/repo">
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="featured" name="featured" {% if project and project.featured %}checked{% endif %}>
+            <label class="form-check-label" for="featured">Feature this project</label>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i> Featured projects appear prominently on the homepage.
+            </div>
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> {{ 'Update' if project else 'Save' }} Project
+            </button>
+            {% if project %}
+                <button type="button" class="btn btn-danger ms-2" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteProjectModal">
+                    <i class="fas fa-trash-alt me-2"></i> Delete Project
+                </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% if project %}
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" 
+     aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProjectModalLabel">
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the project <strong>{{ project.title }}</strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('admin_delete_project', id=project.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Project
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Optional JavaScript for enhanced form functionality -->
+{% endblock %} 

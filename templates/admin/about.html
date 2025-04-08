@@ -1,0 +1,34 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Edit About Content{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="bangers-font">Edit About Content</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="comic-panel">
+    <form method="POST" action="{{ url_for('admin_about') }}">
+        <div class="mb-3">
+            <label for="content" class="form-label">About Content</label>
+            <textarea class="form-control" id="content" name="content" rows="10" required>{{ about.content if about else '' }}</textarea>
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i> HTML tags are allowed for formatting.
+            </div>
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> Save Content
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include any rich text editor if needed -->
+{% endblock %} 

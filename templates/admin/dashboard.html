@@ -1,0 +1,201 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="bangers-font">Dashboard</h1>
+        <span class="badge bg-primary fs-6">Welcome, {{ current_user.username }}</span>
+    </div>
+    
+    <div class="row">
+        <!-- Stats Cards -->
+        <div class="col-md-3 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.about_count }}</h3>
+                    <p class="stats-label">About Sections</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.skills_count }}</h3>
+                    <p class="stats-label">Skills</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.projects_count }}</h3>
+                    <p class="stats-label">Projects</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.achievements_count }}</h3>
+                    <p class="stats-label">Achievements</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- More Stats Cards -->
+        <div class="col-md-4 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.education_count }}</h3>
+                    <p class="stats-label">Education Items</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="comic-panel stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-blog"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.blog_posts_count }}</h3>
+                    <p class="stats-label">Blog Posts</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="comic-panel stats-card {% if stats.unread_messages > 0 %}highlight-card{% endif %}">
+                <div class="stats-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ stats.unread_messages }}</h3>
+                    <p class="stats-label">Unread Messages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Messages -->
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="comic-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="bangers-font">Recent Messages</h2>
+                    <a href="{{ url_for('admin_messages') }}" class="btn btn-sm btn-primary">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                
+                <div class="terminal-box">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="terminal-btn red"></span>
+                            <span class="terminal-btn yellow"></span>
+                            <span class="terminal-btn green"></span>
+                        </div>
+                        <div class="terminal-title">recent_messages.log</div>
+                    </div>
+                    <div class="terminal-body">
+                        {% if recent_messages %}
+                            <table class="table table-dark table-striped table-bordered table-responsive-md mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Subject</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for message in recent_messages %}
+                                        <tr class="{% if not message.is_read %}unread-row{% endif %}">
+                                            <td>{{ message.name }}</td>
+                                            <td>{{ message.email }}</td>
+                                            <td>{{ message.subject }}</td>
+                                            <td>{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>
+                                                {% if message.is_read %}
+                                                    <span class="badge bg-success">Read</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Unread</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="terminal-text text-center py-3">
+                                <p class="mb-0">No messages yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="comic-panel">
+                <h2 class="bangers-font mb-4">Quick Actions</h2>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_project') }}" class="btn btn-primary d-block py-3">
+                            <i class="fas fa-plus-circle me-2"></i> Add Project
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_skill') }}" class="btn btn-primary d-block py-3">
+                            <i class="fas fa-plus-circle me-2"></i> Add Skill
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_blog_post') }}" class="btn btn-primary d-block py-3">
+                            <i class="fas fa-plus-circle me-2"></i> Add Blog Post
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_achievement') }}" class="btn btn-primary d-block py-3">
+                            <i class="fas fa-plus-circle me-2"></i> Add Achievement
+                        </a>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_about') }}" class="btn btn-primary d-block py-3">
+                            <i class="fas fa-user-edit me-2"></i> Edit About
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,94 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ 'Edit' if skill else 'Add' }} Skill{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="bangers-font">{{ 'Edit' if skill else 'Add' }} Skill</h1>
+    <a href="{{ url_for('admin_skills') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Skills
+    </a>
+</div>
+
+<div class="comic-panel">
+    <form method="POST" action="{{ url_for('admin_add_skill', id=skill.id) if skill else url_for('admin_add_skill') }}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Skill Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ skill.name if skill else '' }}" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <input type="text" class="form-control" id="category" name="category" value="{{ skill.category if skill else '' }}" required>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i> E.g., Programming Languages, Frameworks, Design Tools
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="proficiency" class="form-label">Proficiency (0-100)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="proficiency" name="proficiency" min="0" max="100" value="{{ skill.proficiency if skill else 0 }}" required>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="mt-2">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: {{ skill.proficiency if skill else 0 }}%;"
+                                 aria-valuenow="{{ skill.proficiency if skill else 0 }}" aria-valuemin="0" aria-valuemax="100"
+                                 id="proficiencyBar">
+                                {{ skill.proficiency if skill else 0 }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="icon" class="form-label">Icon Class</label>
+                    <input type="text" class="form-control" id="icon" name="icon" value="{{ skill.icon if skill else '' }}" placeholder="fab fa-python">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i> Font Awesome icon class (e.g., fab fa-js, fas fa-code)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="display_order" class="form-label">Display Order</label>
+            <input type="number" class="form-control" id="display_order" name="display_order" value="{{ skill.display_order if skill else 0 }}" min="0">
+            <div class="form-text">
+                <i class="fas fa-info-circle me-1"></i> Lower numbers will appear first
+            </div>
+        </div>
+        
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> {{ 'Update' if skill else 'Save' }} Skill
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update progress bar in real-time
+    document.getElementById('proficiency').addEventListener('input', function() {
+        var value = this.value;
+        if (value < 0) value = 0;
+        if (value > 100) value = 100;
+        
+        var progressBar = document.getElementById('proficiencyBar');
+        progressBar.style.width = value + '%';
+        progressBar.setAttribute('aria-valuenow', value);
+        progressBar.textContent = value + '%';
+    });
+</script>
+{% endblock %} 

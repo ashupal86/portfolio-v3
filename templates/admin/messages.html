@@ -1,0 +1,132 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Contact Messages{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="bangers-font">Contact Messages</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="comic-panel">
+    <div class="terminal-box">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span class="terminal-btn red"></span>
+                <span class="terminal-btn yellow"></span>
+                <span class="terminal-btn green"></span>
+            </div>
+            <div class="terminal-title">messages.log</div>
+        </div>
+        <div class="terminal-body">
+            {% if messages %}
+                <table class="table table-dark table-striped table-bordered table-responsive-md mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in messages %}
+                            <tr class="{% if not message.is_read %}unread-row{% endif %}">
+                                <td>{{ message.name }}</td>
+                                <td>{{ message.email }}</td>
+                                <td>{{ message.subject }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#messageModal{{ message.id }}">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </button>
+                                </td>
+                                <td>{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if message.is_read %}
+                                        <span class="badge bg-success">Read</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Unread</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not message.is_read %}
+                                        <form method="POST" action="{{ url_for('admin_mark_message_read', id=message.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-check me-1"></i> Mark as Read
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            
+                            <!-- Message Modal -->
+                            <div class="modal fade" id="messageModal{{ message.id }}" tabindex="-1" aria-labelledby="messageModalLabel{{ message.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="messageModalLabel{{ message.id }}">Message from {{ message.name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <strong>From:</strong> {{ message.name }} &lt;{{ message.email }}&gt;
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong>Subject:</strong> {{ message.subject }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong>Date:</strong> {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong>Message:</strong>
+                                                <div class="p-3 border rounded bg-light">
+                                                    {{ message.message|nl2br }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            {% if not message.is_read %}
+                                                <form method="POST" action="{{ url_for('admin_mark_message_read', id=message.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-check me-1"></i> Mark as Read
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="terminal-text text-center py-3">
+                    <p class="mb-0">No messages yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-mark as read when opening a message
+    var messageModals = document.querySelectorAll('[id^="messageModal"]');
+    messageModals.forEach(function(modal) {
+        modal.addEventListener('shown.bs.modal', function () {
+            var markAsReadBtn = modal.querySelector('form button[type="submit"]');
+            if (markAsReadBtn) {
+                // Optional: Auto-submit the form
+                // markAsReadBtn.closest('form').submit();
+            }
+        });
+    });
+</script>
+{% endblock %} 

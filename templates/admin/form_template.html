@@ -1,0 +1,200 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="admin-form">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="bangers-font">{{ title }}</h1>
+        <a href="{{ back_url }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Back
+        </a>
+    </div>
+    
+    <div class="comic-panel form-panel">
+        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {{ form.csrf_token }}
+            
+            <div class="row">
+                {% for field in form if field.name != 'csrf_token' and field.name != 'submit' %}
+                    <div class="col-md-{% if field.type == 'TextAreaField' or field.name == 'content' %}12{% else %}6{% endif %} mb-3">
+                        <div class="form-group">
+                            {{ field.label(class="form-label") }}
+                            
+                            {% if field.type == 'FileField' %}
+                                {# File upload field with preview #}
+                                <div class="custom-file-upload" id="file-upload-{{ field.name }}">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <p>Click to upload or drag and drop</p>
+                                    <small>SVG, PNG, JPG or GIF (max 2MB)</small>
+                                    {{ field(class="file-input", style="display: none;") }}
+                                </div>
+                                
+                                {% if item and item[field.name] %}
+                                    <div class="current-image mb-3">
+                                        <p><strong>Current file:</strong> {{ item[field.name] }}</p>
+                                        <img src="{{ url_for('static', filename=item[field.name]) }}" 
+                                             alt="Current image" class="file-preview">
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="preview-container" style="display: none;">
+                                    <h6 class="mt-3">Preview:</h6>
+                                    <img src="" alt="Preview" class="file-preview">
+                                </div>
+                                
+                            {% elif field.type == 'TextAreaField' %}
+                                {# Text area with rich text editor if it's content field #}
+                                {% if field.name == 'content' %}
+                                    {{ field(class="form-control editor", rows=10) }}
+                                {% else %}
+                                    {{ field(class="form-control", rows=5) }}
+                                {% endif %}
+                                
+                            {% elif field.type == 'DateField' or field.type == 'DateTimeField' %}
+                                {# Date and DateTime fields #}
+                                {{ field(class="form-control", type="date") }}
+                                
+                            {% elif field.type == 'BooleanField' %}
+                                {# Boolean field as a switch #}
+                                <div class="form-check form-switch">
+                                    {{ field(class="form-check-input") }}
+                                </div>
+                                
+                            {% elif field.type == 'SelectField' %}
+                                {# Select fields #}
+                                {{ field(class="form-select") }}
+                                
+                            {% else %}
+                                {# Regular input fields #}
+                                {{ field(class="form-control") }}
+                            {% endif %}
+                            
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.description %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> Save
+                </button>
+                <a href="{{ back_url }}" class="btn btn-outline-secondary ms-2">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if 'content' in form._fields %}
+<script src="https://cdn.ckeditor.com/ckeditor5/29.0.0/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor
+        ClassicEditor
+            .create(document.querySelector('.editor'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                    ]
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // File upload handling with preview
+        document.querySelectorAll('.custom-file-upload').forEach(uploadArea => {
+            const inputField = uploadArea.querySelector('.file-input');
+            const previewContainer = uploadArea.nextElementSibling?.nextElementSibling;
+            const previewImage = previewContainer?.querySelector('.file-preview');
+            
+            uploadArea.addEventListener('click', () => {
+                inputField.click();
+            });
+            
+            inputField.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        if (previewContainer && previewImage) {
+                            previewImage.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                        }
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Handle drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length) {
+                    inputField.files = e.dataTransfer.files;
+                    
+                    if (previewContainer && previewImage) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            previewImage.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                        }
+                        
+                        reader.readAsDataURL(e.dataTransfer.files[0]);
+                    }
+                }
+            });
+        });
+        
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %} 

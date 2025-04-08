@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<section class="projects-section py-5">
+    <div class="container">
+        <h1 class="bangers-font text-center mb-5">My Projects</h1>
+        
+        {% if projects %}
+            <!-- Project Filters -->
+            <div class="project-filters mb-4 text-center">
+                <div class="comic-panel p-3">
+                    <div class="btn-group" role="group" aria-label="Project filters">
+                        <button type="button" class="btn btn-filter active" data-filter="all">
+                            All
+                        </button>
+                        {% for category in categories %}
+                            <button type="button" class="btn btn-filter" data-filter="{{ category }}">
+                                {{ category }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Projects Grid -->
+            <div class="row" id="projectsGrid">
+                {% for project in projects %}
+                    <div class="col-md-6 col-lg-4 mb-4 project-item" 
+                         data-category="{{ project.category }}">
+                        <div class="project-card animate-on-scroll">
+                            <a href="{{ url_for('project_detail', id=project.id) }}" class="project-card-link">
+                                {% if project.image %}
+                                    <img src="{{ url_for('static', filename=project.image) }}" 
+                                         alt="{{ project.title }}" class="project-img">
+                                {% else %}
+                                    <div class="project-img d-flex align-items-center justify-content-center bg-dark">
+                                        <i class="fas fa-code fa-3x text-primary"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="project-content">
+                                    <h3 class="bangers-font">{{ project.title }}</h3>
+                                    <div class="project-category mb-2">
+                                        <span class="badge bg-primary">{{ project.category }}</span>
+                                    </div>
+                                    <p>{{ project.description }}</p>
+                                    <div class="d-flex flex-wrap mb-3">
+                                        {% for tech in project.technologies.split(',') %}
+                                            <span class="tech-badge">{{ tech.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="project-links">
+                                <a href="{{ url_for('project_detail', id=project.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-info-circle me-1"></i> Details
+                                </a>
+                                {% if project.url %}
+                                    <a href="{{ project.url }}" target="_blank" class="btn btn-outline-primary ms-2">
+                                        <i class="fas fa-external-link-alt me-1"></i> Demo
+                                    </a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <a href="{{ project.github_url }}" target="_blank" class="btn btn-dark ms-2">
+                                        <i class="fab fa-github me-1"></i> Code
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="comic-panel text-center p-5">
+                <i class="fas fa-laptop-code fa-5x mb-4 text-primary"></i>
+                <h3 class="bangers-font">No Projects Yet</h3>
+                <p>Projects will be added soon! Check back later.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if projects %}
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Project filtering
+            const filterButtons = document.querySelectorAll('.btn-filter');
+            const projectItems = document.querySelectorAll('.project-item');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Active button state
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter projects
+                    projectItems.forEach(item => {
+                        if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    {% endblock %}
+{% endif %}
+{% endblock %} 
