@@ -1,0 +1,321 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ achievement.title }} - Achievement Details{% endblock %}
+
+{% block content %}
+<section class="achievement-detail-section py-5">
+    <div class="container">
+        <div class="comic-panel p-0 overflow-hidden animate-on-scroll">
+            <!-- Hero Section -->
+            <div class="achievement-hero position-relative">
+                {% if achievement.image %}
+                    <div class="achievement-image-container">
+                        <img src="{{ url_for('static', filename=achievement.image) }}" 
+                             alt="{{ achievement.title }}" class="achievement-hero-img">
+                    </div>
+                {% else %}
+                    <div class="achievement-hero-placeholder d-flex align-items-center justify-content-center">
+                        <i class="fas fa-trophy fa-5x text-primary"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Achievement Title Overlay -->
+                <div class="achievement-title-overlay {% if achievement.is_winner %}winner-overlay{% elif achievement.is_certification %}certification-overlay{% endif %}">
+                    <div class="container">
+                        <h1 class="bangers-font display-4 {% if achievement.is_winner %}winner-title{% elif achievement.is_certification %}certification-title{% endif %}">
+                            {{ achievement.title }}
+                            {% if achievement.is_winner %}
+                                <i class="fas fa-trophy text-warning ms-2"></i>
+                            {% elif achievement.is_certification %}
+                                <i class="fas fa-certificate text-info ms-2"></i>
+                            {% endif %}
+                        </h1>
+                        <div class="d-flex flex-wrap align-items-center">
+                            {% if achievement.date %}
+                                <div class="achievement-date me-2">
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-calendar-alt me-2"></i>{{ achievement.date.strftime('%d %B %Y') }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if achievement.achievement_type %}
+                                <div class="achievement-type">
+                                    <span class="badge {% if achievement.achievement_type == 'Competition' %}winner-badge bg-warning{% elif achievement.is_certification %}certification-badge bg-info{% else %}bg-secondary{% endif %}">
+                                        {% if achievement.achievement_type == 'Competition' %}
+                                            <i class="fas fa-trophy me-1"></i> Competition
+                                        {% elif achievement.achievement_type == 'Certification' %}
+                                            <i class="fas fa-certificate me-1"></i> Certification
+                                        {% elif achievement.achievement_type == 'Position' %}
+                                            <i class="fas fa-user-tie me-1"></i> Position
+                                        {% elif achievement.achievement_type == 'Webinar' %}
+                                            <i class="fas fa-chalkboard-teacher me-1"></i> Webinar
+                                        {% elif achievement.achievement_type == 'Event' %}
+                                            <i class="fas fa-calendar-day me-1"></i> Event
+                                        {% else %}
+                                            <i class="fas fa-award me-1"></i> {{ achievement.achievement_type }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement-content p-4 p-md-5">
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mb-4">
+                    <a href="{{ url_for('index') }}#achievements" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Achievements
+                    </a>
+                </div>
+                
+                <!-- Achievement Description -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="terminal-box mb-4">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="terminal-btn red"></span>
+                                    <span class="terminal-btn yellow"></span>
+                                    <span class="terminal-btn green"></span>
+                                </div>
+                                <div class="terminal-title">achievement.md</div>
+                            </div>
+                            <div class="terminal-body p-4">
+                                <h3 class="bangers-font mb-3">About This Achievement</h3>
+                                <div class="achievement-description">
+                                    {{ achievement.description | nl2br | safe }}
+                                </div>
+                                
+                                {% if achievement.linkedin_url %}
+                                <div class="achievement-linkedin mt-4">
+                                    <a href="{{ achievement.linkedin_url }}" target="_blank" class="btn btn-linkedin">
+                                        <i class="fab fa-linkedin me-2"></i> View on LinkedIn
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Certificate Section (if available) -->
+                {% if achievement.certificate_pdf %}
+                    <div class="certificate-section comic-panel mt-4">
+                        <h3 class="bangers-font mb-3">Certificate</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pdf-preview">
+                                    <div class="pdf-icon me-3">
+                                        <i class="far fa-file-pdf fa-3x text-danger"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Certificate of Achievement</h5>
+                                        <p class="mb-0">You can download or view this certificate.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center justify-content-end">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('static', filename=achievement.certificate_pdf) }}" class="btn btn-primary" download>
+                                        <i class="fas fa-download me-2"></i> Download
+                                    </a>
+                                    <a href="{{ url_for('view_certificate', filename=achievement.certificate_pdf.split('/')[-1]) }}" class="btn btn-outline-primary" target="_blank">
+                                        <i class="fas fa-eye me-2"></i> View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Basic styles */
+    .achievement-hero {
+        position: relative;
+        height: 300px;
+        background-color: #f5f5f5;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border-radius: 15px;
+    }
+    
+    .achievement-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .achievement-image-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.1);
+        color: #555;
+    }
+    
+    .achievement-title-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Winner overlay styling */
+    .winner-overlay {
+        background: linear-gradient(transparent, rgba(255, 215, 0, 0.7));
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .winner-overlay::before {
+        content: "\f091";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 48px;
+        color: rgba(255, 215, 0, 0.8);
+        animation: bounce 2s infinite;
+        z-index: 1;
+    }
+    
+    .winner-title {
+        color: #FFD700;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+    }
+    
+    /* Certification overlay styling */
+    .certification-overlay {
+        background: linear-gradient(transparent, rgba(30, 144, 255, 0.7));
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .certification-overlay::before {
+        content: "\f19d";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 48px;
+        color: rgba(30, 144, 255, 0.8);
+        animation: rotate 3s infinite alternate;
+        z-index: 1;
+    }
+    
+    .certification-title {
+        color: #87CEFA;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+    }
+    
+    /* Animations */
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-10px);}
+        60% {transform: translateY(-5px);}
+    }
+    
+    @keyframes rotate {
+        from {transform: rotate(-5deg);}
+        to {transform: rotate(5deg);}
+    }
+    
+    .achievement-image-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .achievement-description {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #333;
+        white-space: pre-line;
+    }
+    
+    .achievement-meta {
+        margin-bottom: 2rem;
+    }
+    
+    .certificate-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .view-certificate-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Fix date and achievement type layout */
+    .achievement-date {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+    
+    .achievement-date .badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        background-color: rgba(13, 110, 253, 0.9) !important;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .achievement-type {
+        display: inline-block;
+    }
+    
+    .achievement-type .badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Content styling improvements */
+    .achievement-content {
+        background-color: #fff;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .terminal-box {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    @media (max-width: 768px) {
+        .achievement-hero {
+            height: 200px;
+        }
+    }
+</style>
+{% endblock %} 

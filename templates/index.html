@@ -22,7 +22,7 @@
 </section>
 
 <!-- About Section -->
-<section id="about" class="section" style="display: none;">
+<section id="about" class="section">
     <div class="container">
         <h2 class="section-title bangers-font text-center">About Me</h2>
         <div class="row">
@@ -46,36 +46,32 @@
 </section>
 
 <!-- Skills Section -->
-<section id="skills" class="section" style="display: none;">
+<section id="skills" class="section">
     <div class="container">
-        <h2 class="section-title bangers-font text-center">My Skills</h2>
+        <h2 class="section-title bangers-font text-center">Skills</h2>
+        <p class="text-center mb-5">My technical and professional expertise</p>
         
-        {% if skills_by_category %}
-            <div class="skills-container">
-                {% for category, skills in skills_by_category.items() %}
-                    <div class="skill-category mb-5 animate-on-scroll">
-                        <h3 class="bangers-font mb-4">{{ category }}</h3>
-                        <div class="skills-tag-container">
-                            {% for skill in skills %}
-                                <div class="skill-tag" data-proficiency="{{ skill.proficiency }}">
-                                    {% if skill.icon %}<i class="{{ skill.icon }} me-2"></i>{% endif %}
-                                    {{ skill.name }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
+        <div class="skills-container">
+            {% for category, skills in skills_by_category.items() %}
+            <div class="skill-category-container">
+                <h3 class="skill-category-title">{{ category }}</h3>
+                <div class="skill-tags-container">
+                    {% for skill in skills %}
+                    <span class="skill-tag {% if category == 'Soft Skills' %}soft-skill{% endif %}">
+                        {% if skill.icon %}<i class="{{ skill.icon }} me-2"></i>{% endif %}
+                        {{ skill.name }}
+                        <small class="skill-proficiency">{{ skill.proficiency }}%</small>
+                    </span>
+                    {% endfor %}
+                </div>
             </div>
-        {% else %}
-            <div class="comic-panel text-center">
-                <p>Skills will be added soon!</p>
-            </div>
-        {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </section>
 
 <!-- Projects Section -->
-<section id="projects" class="section" style="display: none;">
+<section id="projects" class="section">
     <div class="container">
         <h2 class="section-title bangers-font text-center">My Projects</h2>
         
@@ -186,92 +182,135 @@
 </section>
 
 <!-- Achievements Section -->
-<section id="achievements" class="section" style="display: none;">
+<section id="achievements" class="section">
     <div class="container">
-        <h2 class="section-title bangers-font text-center">Achievements</h2>
+        <h2 class="section-title bangers-font text-center">Achievements & Events</h2>
         
         {% if achievements %}
-            <div class="row">
+            <div class="achievement-list">
                 {% for achievement in achievements %}
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="achievement-card animate-on-scroll" data-achievement-id="{{ achievement.id }}">
-                            {% if achievement.image %}
-                                <div class="achievement-image-container">
-                                    <img src="{{ url_for('static', filename=achievement.image) }}" 
-                                         alt="{{ achievement.title }}" class="achievement-img">
-                                    {% if achievement.date %}
-                                        <div class="achievement-date-badge">
-                                            <i class="fas fa-calendar-alt me-1"></i>
-                                            {{ achievement.date.strftime('%b %Y') }}
+                    <div class="achievement-card-container mb-4 animate-on-scroll">
+                        <div class="achievement-card w-100 {% if achievement.achievement_type == 'Competition' %}achievement-winner {% if achievement.is_winner %}is-first-place{% endif %}{% elif achievement.achievement_type == 'Certification' %}achievement-certification{% endif %}">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    {% if achievement.image %}
+                                        <div class="achievement-image-container">
+                                            <img src="{{ url_for('static', filename=achievement.image) }}" 
+                                                 alt="{{ achievement.title }}" class="achievement-img">
+                                            {% if achievement.date %}
+                                                <div class="achievement-date-badge">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    {{ achievement.date.strftime('%d %b %Y') }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="achievement-type-badge {% if achievement.achievement_type == 'Competition' %}winner-badge{% elif achievement.achievement_type == 'Certification' %}certification-badge{% endif %}">
+                                                {% if achievement.achievement_type == 'Competition' %}
+                                                    <i class="fas fa-trophy me-1"></i> Competition
+                                                {% elif achievement.achievement_type == 'Certification' %}
+                                                    <i class="fas fa-certificate me-1"></i> Certification
+                                                {% elif achievement.achievement_type == 'Position' %}
+                                                    <i class="fas fa-user-tie me-1"></i> Position
+                                                {% elif achievement.achievement_type == 'Webinar' %}
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i> Webinar
+                                                {% elif achievement.achievement_type == 'Event' %}
+                                                    <i class="fas fa-calendar-day me-1"></i> Event
+                                                {% elif achievement.event_type == 'Organized' %}
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i> Organized
+                                                {% elif achievement.event_type == 'Attended' %}
+                                                    <i class="fas fa-user-graduate me-1"></i> Attended
+                                                {% else %}
+                                                    <i class="fas fa-award me-1"></i> Achievement
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="achievement-img-placeholder d-flex align-items-center justify-content-center">
+                                            {% if achievement.achievement_type == 'Competition' %}
+                                                <i class="fas fa-trophy fa-3x {% if achievement.is_winner %}text-warning{% else %}text-primary{% endif %}"></i>
+                                            {% elif achievement.achievement_type == 'Certification' %}
+                                                <i class="fas fa-certificate fa-3x text-info"></i>
+                                            {% elif achievement.achievement_type == 'Position' %}
+                                                <i class="fas fa-user-tie fa-3x text-primary"></i>
+                                            {% elif achievement.achievement_type == 'Webinar' %}
+                                                <i class="fas fa-chalkboard-teacher fa-3x text-primary"></i>
+                                            {% elif achievement.achievement_type == 'Event' %}
+                                                <i class="fas fa-calendar-day fa-3x text-primary"></i>
+                                            {% elif achievement.event_type == 'Organized' %}
+                                                <i class="fas fa-chalkboard-teacher fa-3x text-primary"></i>
+                                            {% elif achievement.event_type == 'Attended' %}
+                                                <i class="fas fa-user-graduate fa-3x text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-award fa-3x text-primary"></i>
+                                            {% endif %}
+                                            {% if achievement.date %}
+                                                <div class="achievement-date-badge">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    {{ achievement.date.strftime('%d %b %Y') }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="achievement-type-badge {% if achievement.achievement_type == 'Competition' %}winner-badge{% elif achievement.achievement_type == 'Certification' %}certification-badge{% endif %}">
+                                                {% if achievement.achievement_type == 'Competition' %}
+                                                    <i class="fas fa-trophy me-1"></i> Competition
+                                                {% elif achievement.achievement_type == 'Certification' %}
+                                                    <i class="fas fa-certificate me-1"></i> Certification
+                                                {% elif achievement.achievement_type == 'Position' %}
+                                                    <i class="fas fa-user-tie me-1"></i> Position
+                                                {% elif achievement.achievement_type == 'Webinar' %}
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i> Webinar
+                                                {% elif achievement.achievement_type == 'Event' %}
+                                                    <i class="fas fa-calendar-day me-1"></i> Event
+                                                {% elif achievement.event_type == 'Organized' %}
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i> Organized
+                                                {% elif achievement.event_type == 'Attended' %}
+                                                    <i class="fas fa-user-graduate me-1"></i> Attended
+                                                {% else %}
+                                                    <i class="fas fa-award me-1"></i> Achievement
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     {% endif %}
                                 </div>
-                            {% else %}
-                                <div class="achievement-img-placeholder d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-trophy fa-3x text-primary"></i>
-                                    {% if achievement.date %}
-                                        <div class="achievement-date-badge">
-                                            <i class="fas fa-calendar-alt me-1"></i>
-                                            {{ achievement.date.strftime('%b %Y') }}
+                                <div class="col-md-9">
+                                    <div class="achievement-content">
+                                        <h4 class="achievement-title bangers-font {% if achievement.achievement_type == 'Competition' %}winner-title{% elif achievement.achievement_type == 'Certification' %}certification-title{% endif %}">
+                                            {{ achievement.title }}
+                                            {% if achievement.achievement_type == 'Competition' %}<i class="fas fa-trophy ms-2 text-warning"></i>{% endif %}
+                                            {% if achievement.achievement_type == 'Certification' %}<i class="fas fa-certificate ms-2 text-info"></i>{% endif %}
+                                            {% if achievement.linkedin_url %}
+                                            <a href="{{ achievement.linkedin_url }}" target="_blank" class="linkedin-icon" title="View on LinkedIn">
+                                                <i class="fab fa-linkedin"></i>
+                                            </a>
+                                            {% endif %}
+                                        </h4>
+                                        <p class="achievement-description">{{ achievement.description|truncate(150) }}</p>
+                                        <div class="achievement-view-link">
+                                            <a href="{{ url_for('view_achievement', id=achievement.id) }}" class="btn btn-sm {% if achievement.achievement_type == 'Competition' %}btn-warning{% elif achievement.achievement_type == 'Certification' %}btn-info{% else %}btn-outline-primary{% endif %}">
+                                                <i class="fas {% if achievement.achievement_type == 'Certification' %}fa-certificate{% else %}fa-trophy{% endif %} me-1"></i> View Details
+                                            </a>
                                         </div>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                            <div class="achievement-content">
-                                <h4 class="achievement-title bangers-font">{{ achievement.title }}</h4>
-                                <p class="achievement-description">{{ achievement.description }}</p>
-                                {% if achievement.certificate_pdf %}
-                                    <div class="achievement-certificate mt-2">
-                                        <a href="{{ url_for('static', filename=achievement.certificate_pdf) }}" class="btn btn-sm btn-outline-primary" download>
-                                            <i class="fas fa-download"></i> Download Certificate
-                                        </a>
-                                        <a href="{{ url_for('view_certificate', filename=achievement.certificate_pdf.split('/')[-1]) }}" class="btn btn-sm btn-outline-info ms-2" target="_blank">
-                                            <i class="fas fa-eye"></i> View Certificate
-                                        </a>
                                     </div>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
-            </div>
-            
-            <!-- Achievement Modal (Single modal for all achievements) -->
-            <div class="modal fade" id="achievementModal" tabindex="-1" role="dialog" aria-labelledby="achievementModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title bangers-font" id="achievementModalTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6" id="modalImageContainer">
-                                    <!-- Image will be inserted here via JavaScript -->
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="achievement-modal-description" id="modalDescription">
-                                        <!-- Description will be inserted here via JavaScript -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         {% else %}
             <div class="comic-panel text-center">
                 <p>Achievements will be added soon!</p>
             </div>
         {% endif %}
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}#achievements" class="btn btn-primary">
+                <i class="fas fa-trophy me-2"></i> View All Achievements
+            </a>
+        </div>
     </div>
 </section>
 
 <!-- Education Section -->
-<section id="education" class="section" style="display: none;">
+<section id="education" class="section">
     <div class="container">
         <h2 class="section-title bangers-font text-center">Education</h2>
         
@@ -308,7 +347,7 @@
 </section>
 
 <!-- Blog Preview Section -->
-<section id="blog-preview" class="section" style="display: none;">
+<section id="blog-preview" class="section">
     <div class="container">
         <h2 class="section-title bangers-font text-center">Latest Blog Posts</h2>
         
@@ -358,7 +397,7 @@
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="section" style="display: none;">
+<section id="contact" class="section">
     <div class="container">
         <h2 class="section-title bangers-font text-center">Get In Touch</h2>
         
@@ -398,5 +437,327 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- This block is intentionally left empty as modal functionality is now handled in main.js -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make achievement cards clickable
+        const achievementCards = document.querySelectorAll('.achievement-card');
+        achievementCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // If we clicked on a link inside the card, don't navigate
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    // Let the link handle the click
+                    return;
+                }
+                
+                // Otherwise, find the "View Details" link and navigate to its href
+                const detailsLink = this.querySelector('.achievement-view-link a');
+                if (detailsLink) {
+                    window.location.href = detailsLink.getAttribute('href');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Skills section with dark theme */
+    .skills-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+    }
+    
+    .skill-category-container {
+        background: rgba(33, 37, 41, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-top: 5px solid #6a11cb;
+    }
+    
+    .skill-category-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    .skill-category-title {
+        font-family: 'Bangers', cursive;
+        color: #fff;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px dashed rgba(108, 99, 255, 0.5);
+        font-size: 1.8rem;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
+    }
+    
+    .skill-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+    }
+    
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .skill-tag::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
+    }
+    
+    .skill-tag:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+    }
+    
+    .skill-tag:hover::before {
+        left: 100%;
+    }
+    
+    .soft-skill {
+        background: linear-gradient(135deg, #ff4e50, #f9d423);
+    }
+    
+    .skill-proficiency {
+        margin-left: 8px;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .skills-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Winner Achievement Styles */
+    .achievement-winner {
+        background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,255,255,0.9) 50%, rgba(255,215,0,0.1) 100%);
+        border: 2px solid #FFD700;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .achievement-winner.is-first-place::before {
+        content: '🏆';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        z-index: 2;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .winner-badge {
+        background-color: #FFD700 !important;
+        color: #000 !important;
+        font-weight: bold;
+    }
+    
+    .winner-title {
+        color: #CD7F32;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Certification Achievement Styles */
+    .achievement-certification {
+        background: linear-gradient(135deg, rgba(135,206,250,0.1) 0%, rgba(255,255,255,0.9) 50%, rgba(135,206,250,0.1) 100%);
+        border: 2px solid #4682B4;
+        box-shadow: 0 5px 15px rgba(70,130,180,0.3);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .achievement-certification::before {
+        content: '🎓';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        z-index: 2;
+        animation: rotate 4s infinite;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(10deg); }
+        75% { transform: rotate(-10deg); }
+        100% { transform: rotate(0deg); }
+    }
+    
+    .certification-badge {
+        background-color: #4682B4 !important;
+        color: #fff !important;
+        font-weight: bold;
+    }
+    
+    .certification-title {
+        color: #4682B4;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Achievement Card Hover Effects */
+    .achievement-card-container:hover .achievement-winner {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(255, 215, 0, 0.5);
+    }
+    
+    .achievement-card-container:hover .achievement-certification {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(70,130,180,0.5);
+    }
+    
+    /* Achievement Card Animations */
+    @keyframes shine {
+        0% {
+            background-position: -100px;
+        }
+        40%, 100% {
+            background-position: 300px;
+        }
+    }
+    
+    .achievement-winner {
+        background-image: linear-gradient(135deg, rgba(255,215,0,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,215,0,0) 100%);
+        background-size: 200px 100%;
+        background-repeat: no-repeat;
+        background-position: -100px;
+        animation: shine 3s infinite;
+        animation-delay: 1s;
+    }
+    
+    .achievement-certification {
+        background-image: linear-gradient(135deg, rgba(70,130,180,0) 0%, rgba(255,255,255,0.8) 50%, rgba(70,130,180,0) 100%);
+        background-size: 200px 100%;
+        background-repeat: no-repeat;
+        background-position: -100px;
+        animation: shine 3s infinite;
+        animation-delay: 2s;
+    }
+    
+    /* Fix for date and achievement type badge overlap */
+    .achievement-date-badge {
+        position: absolute;
+        top: 10px;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        z-index: 2;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        max-width: 80%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .achievement-type-badge {
+        position: absolute;
+        left: 10px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        z-index: 2;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        max-width: 80%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .achievement-image-container {
+        position: relative;
+        min-height: 150px;
+    }
+    
+    .achievement-img-placeholder {
+        position: relative;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    /* Make the achievement card more compact and fix spacing */
+    .achievement-card {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        margin-bottom: 0;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .achievement-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .achievement-content {
+        padding: 15px;
+    }
+    
+    .achievement-title {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+    
+    .achievement-description {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    /* Make the entire card clickable */
+    .achievement-card-clickable {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+</style>
 {% endblock %} 

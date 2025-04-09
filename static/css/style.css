@@ -502,33 +502,51 @@ a:hover {
 }
 
 /* Achievements section */
+.achievement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.achievement-card-container {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.achievement-card-container:hover {
+    transform: translateY(-5px);
+}
+
 .achievement-card {
     background-color: var(--panel-bg);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid var(--border-color);
+    transition: border-color 0.3s;
+    display: block;
+    padding: 1.5rem;
     height: 100%;
-    color: var(--text-color);
-    position: relative;
-    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .achievement-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .achievement-image-container {
     position: relative;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
     overflow: hidden;
+    aspect-ratio: 16/9;
 }
 
 .achievement-img {
     width: 100%;
-    height: 200px;
+    height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    border-radius: 6px;
+    transition: transform 0.3s;
 }
 
 .achievement-card:hover .achievement-img {
@@ -537,138 +555,49 @@ a:hover {
 
 .achievement-img-placeholder {
     width: 100%;
-    height: 200px;
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-    color: var(--primary-color);
-    position: relative;
+    height: 180px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
 }
 
 .achievement-date-badge {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: rgba(var(--accent-color-rgb), 0.9);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
+    top: 10px;
+    right: 10px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(4px);
 }
 
 .achievement-content {
-    padding: 20px;
+    padding: 0.5rem 0;
 }
 
 .achievement-title {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
     color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
 }
 
 .achievement-description {
-    font-size: 0.95rem;
-    line-height: 1.5;
     color: var(--text-color);
+    margin-bottom: 1rem;
 }
 
-/* Achievement Modal Styles */
-.modal-content {
-    background-color: var(--bg-color);
-    border: 3px solid var(--border-color);
-    border-radius: 10px;
-    color: var(--text-color);
-    position: relative;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7) !important;
-}
-
-.modal-backdrop {
-    z-index: 1040 !important;
-    background-color: rgba(0, 0, 0, 0) !important;
-    opacity: 0 !important;
-}
-
-.modal {
-    z-index: 1050 !important;
-    padding-right: 0 !important;
-}
-
-.modal-open {
-    overflow: auto !important;
-    padding-right: 0 !important;
-}
-
-.modal-dialog {
-    z-index: 1055 !important;
-}
-
-.btn-close {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    z-index: 100;
-    color: white;
-    opacity: 1;
-}
-
-.modal-header {
-    border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    padding: 1rem 1.5rem;
-}
-
-.modal-header .modal-title {
-    color: var(--bg-color);
-    font-size: 1.8rem;
-    letter-spacing: 0.05em;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.modal-body {
-    background-color: var(--panel-bg);
-    padding: 1.5rem;
-}
-
-.modal-footer {
-    border-top: 1px solid var(--border-color);
-    background-color: var(--bg-color);
-}
-
-.modal-backdrop.show {
-    opacity: 0.8;
-}
-
-.achievement-modal-img {
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    max-height: 300px;
-    width: 100%;
-    object-fit: cover;
-}
-
-.achievement-modal-placeholder {
-    height: 300px;
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.achievement-modal-date {
-    font-size: 1.1rem;
-    color: var(--secondary-color);
-    font-weight: 500;
-}
-
-.achievement-modal-description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    padding: 1rem;
-    background-color: var(--bg-color);
-    border-radius: 8px;
-    border-left: 3px solid var(--primary-color);
-    height: 100%;
+@media (max-width: 768px) {
+    .achievement-card {
+        padding: 1rem;
+    }
+    
+    .achievement-title {
+        font-size: 1.25rem;
+    }
 }
 
 /* Education section */
@@ -1004,4 +933,135 @@ footer:hover .admin-easter-egg {
     height: 100%;
     background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
     border-radius: 4px 0 0 4px;
+}
+
+/* Achievement Modal Styling */
+/* Removing unused CSS for achievement modal */
+
+/* LinkedIn Icons */
+.linkedin-icon {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #0077B5;
+    transition: all 0.2s ease;
+}
+
+.linkedin-icon:hover {
+    color: #005E93;
+    transform: scale(1.2);
+}
+
+.achievement-title .linkedin-icon {
+    vertical-align: middle;
+}
+
+/* Achievement type badge */
+.achievement-type-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Skills Section Styling */
+.skills-section {
+    padding: 60px 0;
+}
+
+.skills-filter {
+    margin-bottom: 30px;
+}
+
+.skills-filter-btn {
+    padding: 8px 20px;
+    margin: 0 5px;
+    border-radius: 30px;
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.skills-filter-btn:hover, 
+.skills-filter-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skill-category-title {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    font-weight: 600;
+}
+
+.skill-category-container {
+    margin-bottom: 40px;
+}
+
+.skill-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    height: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.skill-icon-container {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-light);
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.skill-icon-container i {
+    color: var(--primary-color);
+    font-size: 24px;
+}
+
+.skill-content h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--bg-light);
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: var(--primary-color);
+    width: 0;
+    transition: width 1s ease-in-out;
+}
+
+.proficiency-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-muted);
 } 

@@ -1,0 +1,523 @@
+{
+  "about": {
+    "content": "I am a dedicated, forward-thinking, and detail-oriented Computer Science undergraduate at NIET, Greater Noida, with a deep passion for full-stack development, artificial intelligence, cloud computing, and software engineering. My primary motivation stems from a desire to build impactful technological solutions that solve real-world problems and improve user experiences across domains. I strive to make technology accessible and meaningful by combining my technical expertise with a community-driven mindset.\n\nWith a strong inclination toward open-source contribution, deployment automation, and AI integration, I aim to develop solutions that are robust, scalable, and socially relevant. I am passionate about sharing knowledge and fostering growth among my peers, which drives me to regularly organize and manage technical events, workshops, and bootcamps. In addition to excelling academically, I actively lead and contribute to collaborative projects and student-led initiatives that promote learning, innovation, and inclusion."
+  },
+  "skills": [
+    {
+      "name": "Python",
+      "category": "Programming Languages",
+      "proficiency": 95,
+      "icon": "fab fa-python",
+      "display_order": 1
+    },
+    {
+      "name": "Java",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "icon": "fab fa-java",
+      "display_order": 2
+    },
+    {
+      "name": "JavaScript",
+      "category": "Programming Languages",
+      "proficiency": 80,
+      "icon": "fab fa-js",
+      "display_order": 3
+    },
+    {
+      "name": "HTML5",
+      "category": "Programming Languages",
+      "proficiency": 90,
+      "icon": "fab fa-html5",
+      "display_order": 4
+    },
+    {
+      "name": "CSS3",
+      "category": "Programming Languages",
+      "proficiency": 85,
+      "icon": "fab fa-css3-alt",
+      "display_order": 5
+    },
+    {
+      "name": "SQL",
+      "category": "Database",
+      "proficiency": 85,
+      "icon": "fas fa-database",
+      "display_order": 6
+    },
+    {
+      "name": "SQLite",
+      "category": "Database",
+      "proficiency": 90,
+      "icon": "fas fa-database",
+      "display_order": 7
+    },
+    {
+      "name": "MySQL",
+      "category": "Database",
+      "proficiency": 80,
+      "icon": "fas fa-database",
+      "display_order": 8
+    },
+    {
+      "name": "Flask",
+      "category": "Frameworks",
+      "proficiency": 95,
+      "icon": "fas fa-flask",
+      "display_order": 9
+    },
+    {
+      "name": "Bootstrap",
+      "category": "Frameworks",
+      "proficiency": 90,
+      "icon": "fab fa-bootstrap",
+      "display_order": 10
+    },
+    {
+      "name": "Firebase",
+      "category": "Cloud Services",
+      "proficiency": 80,
+      "icon": "fas fa-fire",
+      "display_order": 12
+    },
+    {
+      "name": "Git",
+      "category": "DevOps",
+      "proficiency": 85,
+      "icon": "fab fa-git-alt",
+      "display_order": 13
+    },
+    {
+      "name": "Docker",
+      "category": "DevOps",
+      "proficiency": 80,
+      "icon": "fab fa-docker",
+      "display_order": 14
+    },
+    {
+      "name": "Google Cloud",
+      "category": "Cloud Services",
+      "proficiency": 75,
+      "icon": "fab fa-google",
+      "display_order": 15
+    },
+    {
+      "name": "Render",
+      "category": "Cloud Services",
+      "proficiency": 80,
+      "icon": "fas fa-cloud-upload-alt",
+      "display_order": 17
+    },
+    {
+      "name": "AWS",
+      "category": "Cloud Services",
+      "proficiency": 80,
+      "icon": "fab fa-aws",
+      "display_order": 18
+    },
+    {
+      "name": "VS Code",
+      "category": "Tools",
+      "proficiency": 90,
+      "icon": "fas fa-code",
+      "display_order": 18
+    },
+    {
+      "name": "Android Studio",
+      "category": "Tools",
+      "proficiency": 75,
+      "icon": "fab fa-android",
+      "display_order": 19
+    },
+    {
+      "name": "Postman",
+      "category": "Tools",
+      "proficiency": 85,
+      "icon": "fas fa-paper-plane",
+      "display_order": 20
+    },
+    {
+      "name": "Figma",
+      "category": "Tools",
+      "proficiency": 70,
+      "icon": "fab fa-figma",
+      "display_order": 21
+    },
+    {
+      "name": "Canva",
+      "category": "Tools",
+      "proficiency": 80,
+      "icon": "fas fa-palette",
+      "display_order": 22
+    },
+    {
+      "name": "Public Speaking",
+      "category": "Soft Skills",
+      "proficiency": 85,
+      "icon": "fas fa-microphone",
+      "display_order": 23
+    },
+    {
+      "name": "Team Leadership",
+      "category": "Soft Skills",
+      "proficiency": 90,
+      "icon": "fas fa-users",
+      "display_order": 24
+    },
+    {
+      "name": "Event Management",
+      "category": "Soft Skills",
+      "proficiency": 85,
+      "icon": "fas fa-calendar-check",
+      "display_order": 25
+    },
+    {
+      "name": "Problem Solving",
+      "category": "Soft Skills",
+      "proficiency": 90,
+      "icon": "fas fa-puzzle-piece",
+      "display_order": 26
+    }
+  ],
+  "projects": [
+    {
+      "title": "Blog Website",
+      "description": "A developer-centric blogging platform aimed at providing users with a seamless content publishing experience. The application allows users to register, write and edit markdown-formatted posts, and manage content through a personal dashboard. It includes features like tag-based filtering, post previews, and admin moderation.",
+      "image": "img/uploads/blog-website.jpg",
+      "github_link": "https://github.com/ashupal86/Blog-Website",
+      "live_link": "",
+      "categories": "Web Development, Flask, Markdown, Bootstrap, SQLite",
+      "category": "Web Development",
+      "featured": 1
+    },
+    {
+      "title": "AiCoamic",
+      "description": "A unique application that leverages AI to convert user prompts into interactive comic dialogues. Using Google's Gemini API, the app generates scenes with stylized conversation bubbles, comic panels, and character expressions. The platform supports multiple themes such as manga, pixel art, and superhero styles.",
+      "image": "img/uploads/aicoamic.jpg",
+      "github_link": "https://github.com/ashupal86/AiCoamic",
+      "live_link": "",
+      "categories": "AI, Flask, Gemini API, Bootstrap",
+      "category": "AI Integration",
+      "featured": 1
+    },
+    {
+      "title": "Zorder",
+      "description": "An AI-driven restaurant management application that automates menu digitization. Using Tesseract OCR, the app extracts text from images or PDF versions of menus and converts them into an editable digital interface. Admins can categorize dishes, mark availability, and modify prices in real-time.",
+      "image": "img/uploads/zorder.jpg",
+      "github_link": "https://github.com/ashupal86/zorder",
+      "live_link": "",
+      "categories": "OCR, Flask, Tesseract, Bootstrap",
+      "category": "Business Solution",
+      "featured": 0
+    },
+    {
+      "title": "Breezy",
+      "description": "A personal productivity dashboard that merges lifestyle updates with career advancement tools. The platform provides weather forecasts, trending news, and an AI-powered career guidance assistant. Features include badge-based leveling, company recommendations, AI-generated suggestions, and networking options.",
+      "image": "img/uploads/breezy.jpg",
+      "github_link": "https://github.com/ashupal86/Breezy",
+      "live_link": "",
+      "categories": "Flask, REST APIs, Bootstrap",
+      "category": "Productivity Tool",
+      "featured": 0
+    },
+    {
+      "title": "Portfolio Website",
+      "description": "A personal web portfolio showcasing my resume, projects, events, and social profiles. Developed using Flask for backend logic and Bootstrap for responsive design, the website features contact forms with email integration, SEO optimization, project cards with GitHub links, and downloadable resume support.",
+      "image": "img/uploads/portfolio.jpg",
+      "github_link": "https://github.com/ashupal86/portfolio-website",
+      "live_link": "",
+      "categories": "Flask, HTML, CSS, JS, Bootstrap",
+      "category": "Web Development",
+      "featured": 1
+    },
+    {
+      "title": "Notes API",
+      "description": "An API-first application to manage notes with PDF export, authentication, and email delivery functionality. Users can log in, create or delete notes, export them as PDFs using PDFKit, or email them directly using an SMTP module. The project follows a modular Flask structure with separation of concerns.",
+      "image": "img/uploads/notes-api.jpg",
+      "github_link": "https://github.com/ashupal86/notes-api",
+      "live_link": "",
+      "categories": "Flask, SQLite, PDFKit, SMTP",
+      "category": "Backend Development",
+      "featured": 0
+    },
+    {
+      "title": "CRM Dashboard",
+      "description": "A lightweight customer relationship management tool built to help track, communicate with, and analyze client interactions. Designed for schools, small businesses, and coaching centers, it features Firebase-auth integration, dynamic dashboards, custom notifications via email, and client CRUD management.",
+      "image": "img/uploads/crm-dashboard.jpg",
+      "github_link": "https://github.com/ashupal86/CRM-Dashboard",
+      "live_link": "",
+      "categories": "Flask, SQLite, Firebase, SMTP",
+      "category": "Business Solution",
+      "featured": 0
+    },
+    {
+      "title": "Merchant Billing & Bookkeeping App",
+      "description": "An Android application designed for merchants to manage monthly purchases, pending payments, and client balances. It features customer registration, floating calculator, category-based purchases, and offline data handling using SQLite. This project emphasizes real-world usability.",
+      "image": "img/uploads/merchant-app.jpg",
+      "github_link": "https://github.com/ashupal86/MyManager",
+      "live_link": "",
+      "categories": "Java, Android Studio, SQLite",
+      "category": "Mobile Development",
+      "featured": 0
+    }
+  ],
+  "achievements": [
+    {
+      "title": "1st Place - Web Showdown (ISTE NIET)",
+      "description": "Won first prize in a competitive web development challenge organized by the ISTE NIET Club. The task involved building a responsive, mobile-friendly web application with interactive UI and server-side logic integration. My submission featured real-time data interaction, a modern design with accessibility in mind, and seamless form handling. The judging panel recognized the project for its functionality, performance, and creative UI/UX approach. This win boosted my confidence in full-stack development and encouraged me to explore more ambitious project ideas.",
+      "date": "2024-02-02",
+      "image": "img/uploads/web-showdown.jpg",
+      "certificate_pdf": "uploads/web-showdown-certificate.pdf",
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_webshowdown-isteclub-webdevelopment-activity-7303835478762418179-7-DT",
+      "achievement_type": "Competition"
+    },
+    {
+      "title": "Finalist - Codeathon 2.0 (ProNetiX Club)",
+      "description": "Qualified as a finalist in Codeathon 2.0, a challenging DSA-based competition hosted by the ProNetiX Club. The event consisted of two intensive rounds that tested algorithmic thinking, data structures knowledge, and time-bound problem solving. Competing with some of the most skilled participants at NIET helped sharpen my logical reasoning and reinforced my foundation in core programming concepts.",
+      "date": "2024-01-28",
+      "image": "img/uploads/codeathon.jpg",
+      "certificate_pdf": "uploads/codeathon-certificate.pdf",
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_codeathon2-missionaccomplished-dsamastery-activity-7305905124864860160-_-qi",
+      "achievement_type": "Competition"
+    },
+    {
+      "title": "3rd Place - Web Wizard (NIET)",
+      "description": "Earned third place in the Web Wizard contest hosted by NIET, where participants had to develop and deploy a responsive website within a limited timeframe. My entry focused on minimalism, accessibility, and optimization. The recognition validated my skills in designing user-centric and performance-optimized frontend applications.",
+      "date": "2023-11-18",
+      "image": "img/uploads/web-wizard.jpg",
+      "certificate_pdf": "uploads/web-wizard-certificate.pdf",
+      "linkedin_url": "",
+      "achievement_type": "Competition"
+    },
+    {
+      "title": "GCP Cloud Foundations Certificate",
+      "description": "Successfully completed the Google Cloud Foundations program through GDG NIET's Arcade initiative. This certification introduced me to key cloud concepts including virtual machines, identity and access management, storage systems, App Engine, and Kubernetes. It helped me understand the lifecycle of cloud-hosted applications and how to securely manage resources at scale.",
+      "date": "2022-12-05",
+      "image": "img/uploads/gcp-certificate.jpg",
+      "certificate_pdf": "uploads/gcp-certificate.pdf",
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_cloudabryatra-cloudabryatra-ocd-activity-7220515127383449601-am_y",
+      "achievement_type": "Certification"
+    },
+    {
+      "title": "Python for Data Science - IBM (Coursera)",
+      "description": "Completed the IBM specialization course on Python for Data Science via Coursera. This intensive course series introduced me to Python's application in solving data science problems using practical and industry-relevant tools. It covered data manipulation and cleaning using pandas, numerical computing through NumPy, and data visualization with matplotlib and seaborn. I also explored APIs, JSON handling, and web scraping for data collection. Throughout the course, I completed multiple mini-projects involving real-world datasets. These included building data pipelines, creating histograms and pie charts, and analyzing structured and unstructured data.",
+      "date": "2022-10-10",
+      "image": "img/uploads/ibm-certificate.jpg",
+      "certificate_pdf": "uploads/ibm-certificate.pdf",
+      "linkedin_url": "",
+      "achievement_type": "Certification"
+    },
+    {
+      "title": "Technical Head - Ekume Club, NIET",
+      "description": "As the Technical Head of Ekume Club, I have led multiple technical initiatives that include the planning, coordination, and execution of events aimed at upskilling students in areas such as Git, Docker, deployment strategies, and AI. I designed hands-on content for sessions, mentored over 50 students, and helped integrate industry best practices into learning modules. I spearheaded the club's transition to more practical, project-based sessions, ensuring each workshop provided tangible takeaways. From technical guidance to logistics, I supervised the end-to-end delivery of sessions such as Deploy 101, Web Wizard, and AR in Snap, significantly raising the club's impact and visibility.",
+      "date": "2024-04-01",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "",
+      "achievement_type": "Position"
+    },
+    {
+      "title": "Technical Coordinator - NIET Tech Fests",
+      "description": "As part of NIET's central event committee, I was responsible for coordinating backend logistics, setting up technical infrastructure, and facilitating inter-club communication during annual college tech fests. I contributed to the planning of 10+ technical events across various departments, handling participant registrations, live coding setups, and multimedia integration. I also managed backend systems for real-time leaderboards, timekeeping, and certificate generation. This role greatly enhanced my event management capabilities and strengthened my collaboration with faculty, developers, and designers.",
+      "date": "2023-03-01",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "",
+      "achievement_type": "Position"
+    }
+  ],
+  "events": [
+    {
+      "title": "Organized - Snap AR Workshop with Chhavi Garg",
+      "description": "Hosted in collaboration with BharatXR and Arexa, this interactive session introduced students to Snap Lens and the creative world of augmented reality. With over 80 participants, we covered basics of AR development, industry applications, and portfolio building in immersive technologies. As organizer, I managed speaker outreach, event marketing, technical support, and post-event engagement. The event provided participants hands-on experience with AR filters and opened doors to the world of immersive storytelling.",
+      "date": "2025-03-15",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_certificate-of-recognition-bharatxr-activity-7314995676902240256-OVZ2",
+      "event_type": "Organized"
+    },
+    {
+      "title": "Organized & Spoke - Deploy 101 Workshop (Ekume Club)",
+      "description": "As the lead speaker and event coordinator, I conducted an in-depth workshop covering Docker fundamentals, containerization strategies, and full-stack deployment using platforms like Render and Railway. I created detailed learning modules, demonstration code, and live walk-throughs of writing Dockerfiles and deploying Flask-based web apps. Participants left with deployable apps and Docker knowledge for their future projects.",
+      "date": "2025-02-21",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/niet-ekume-club-620a8b292_deploy101-ekumeworkshop-webdeploymentmastery-ugcPost-7302404209214111744-A_ro",
+      "event_type": "Organized"
+    },
+    {
+      "title": "Attended - Build with AI (Google Gurgaon)",
+      "description": "Participated in AI-focused sessions hosted by TensorFlow User Group at Google's Gurgaon campus. Attended deep dives on Gemini, GraphRAGs, Neo4j, and agent workflows. Networking with AI experts and live demos strengthened my understanding of real-world LLM integration.",
+      "date": "2025-03-05",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_buildwithai-tensorflowusergroup-ai-activity-7311415341270634496-qLqe",
+      "event_type": "Attended"
+    },
+    {
+      "title": "Attended - AI Community Days (ThoughtWorks)",
+      "description": "Explored AI deployment tools and innovations during this event featuring sessions on LLM architecture, Golang vs Python in AI pipelines, GCP and Firebase integration, and career insights from AI engineers. Learned about optimizing inference and scaling solutions.",
+      "date": "2025-02-15",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_aicommunitydays-tensorflow-googleai-activity-7299303167517696001-eta5",
+      "event_type": "Attended"
+    },
+    {
+      "title": "Attended - Cloud Yatra (GDG Cloud Noida)",
+      "description": "Attended GCP-focused talks on Kubernetes, observability, security, and large-scale deployment. Speakers included GCP experts, Red Hat specialists, and cloud architects. Learned about managing workloads across multi-cloud platforms and improving DevOps practices.",
+      "date": "2025-01-20",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/ashish-pal-5725a6257_cloudabryatra-cloudabryatra-ocd-activity-7220515127383449601-am_y",
+      "event_type": "Attended"
+    },
+    {
+      "title": "Organized - DevSpark Web Hackathon",
+      "description": "This hackathon challenged teams to develop websites across three themes: e-commerce, payment gateways, and startup landing pages. As a core organizer, I developed problem statements, coordinated with judges, and oversaw logistics. Winning teams received internship offers. The event attracted 150+ registrations and was a highlight of our tech fest.",
+      "date": "2024-10-10",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/niet-ekume-club-620a8b292_devspark-ekumeclub-teamsuccess-ugcPost-7248334998687100928-3Myy",
+      "event_type": "Organized"
+    },
+    {
+      "title": "Organized - Engineers' Day Expert Talk with Aniket Dhiman",
+      "description": "Coordinated and managed a motivational session with Mr. Aniket Dhiman, startup founder and national-level speaker. Focused on engineering innovation, leadership, and startup culture. Managed stage coordination, media, and participant Q&A.",
+      "date": "2024-09-15",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/niet-ekume-club-620a8b292_the-emerging-club-ekume-organized-an-activity-7111640771098730496-1Uah",
+      "event_type": "Organized"
+    },
+    {
+      "title": "Organized - Interactive Session on AI, Blockchain & Social Media",
+      "description": "Organized a roundtable-style event where students discussed cutting-edge tech like AI governance, blockchain in finance, and digital branding. Top participants received merchandise and participation certificates. The goal was to encourage public speaking, tech exploration, and peer-led learning.",
+      "date": "2025-04-09",
+      "image": "img/uploads/default-event.jpg",
+      "certificate_pdf": null,
+      "linkedin_url": "https://www.linkedin.com/posts/niet-ekume-club-620a8b292_ekumeclub-interactivesession-ai-activity-7238617002909523968--9Tm",
+      "event_type": "Organized"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Noida Institute of Engineering and Technology (NIET), Greater Noida",
+      "degree": "Bachelor of Technology",
+      "field": "Computer Science Engineering",
+      "start_date": "2022-08-01",
+      "end_date": "2026-05-30",
+      "description": "My academic journey at NIET has been enriched by rigorous coursework and meaningful real-world applications."
+    },
+    {
+      "institution": "K.C. International School (CBSE), Meerut",
+      "degree": "Intermediate",
+      "field": "Science",
+      "start_date": "2020-04-01",
+      "end_date": "2022-03-31",
+      "description": "Scored 69% in Intermediate (Class XII) with a focus on Physics, Chemistry, and Mathematics."
+    },
+    {
+      "institution": "K.C. International School (CBSE), Meerut",
+      "degree": "High School",
+      "field": "General",
+      "start_date": "2018-04-01",
+      "end_date": "2020-03-31",
+      "description": "Scored 75% in High School (Class X)."
+    }
+  ],
+  "blog_posts": [
+    {
+      "title": "My Journey as Technical Head at Ekume Club",
+      "content": "<p>Leading the technical initiatives at Ekume Club has been one of the most rewarding experiences of my college journey. In this post, I'll share insights about coordinating multiple workshops, mentoring junior students, and building a community of tech enthusiasts.</p><p>When I first took on the role of Technical Head, I knew I wanted to create a more practical, hands-on approach to learning. This led to organizing sessions like Deploy 101, where students could get direct experience with Docker and deployment platforms.</p><p>One of the biggest challenges was making complex topics accessible to beginners while still providing value to advanced students. We solved this by creating tiered learning paths and pairing experienced students with newcomers during hands-on sessions.</p><p>Beyond technical skills, leading the club has taught me about effective communication, delegation, and the importance of building an inclusive community. These soft skills have proven just as valuable as my programming knowledge.</p><p>I'm proud to see how many students have gone from passive participants to active contributors, sharing their knowledge and taking on leadership roles in various events.</p>",
+      "image": "img/uploads/ekume-club.jpg",
+      "certificate_pdf": null,
+      "slug": "my-journey-as-technical-head-at-ekume-club"
+    },
+    {
+      "title": "The Evolution of My Learning Path in CS",
+      "content": "<p>My journey in computer science has evolved significantly since I began my studies at NIET. In this post, I'll reflect on the milestones that shaped my technical focus and future aspirations.</p><p>Like many CS students, I started with a broad interest in programming but no clear specialization. My first breakthrough came with Python, which opened doors to both backend development and data science. Early projects helped me discover my passion for building complete systems rather than focusing on a single layer.</p><p>The turning point was participating in my first hackathon, where our team built a functional prototype in just 48 hours. This experience showed me the value of rapid iteration, prioritization, and cross-functional collaboration. It also introduced me to Flask, which has since become my go-to framework for web applications.</p><p>More recently, exploring AI and cloud technologies has expanded my toolkit and vision for what's possible. Working with Google's Gemini API and exploring GCP services has inspired me to combine traditional development with cutting-edge AI capabilities.</p><p>Looking ahead, I'm focusing on deepening my knowledge of containerization, learning more about large language models, and exploring edge computing use cases.</p>",
+      "image": "img/uploads/learning-path.jpg",
+      "certificate_pdf": null,
+      "slug": "the-evolution-of-my-learning-path-in-cs"
+    },
+    {
+      "title": "How I Approach Organizing Technical Workshops",
+      "content": "<p>Organizing effective technical workshops requires a balance of solid content, engaging delivery, and thoughtful logistics. In this post, I'll share my methodology for creating workshops that deliver real value to participants.</p><p>My approach begins with identifying a specific, actionable learning outcome. For example, rather than a general 'Introduction to Git,' I aim for 'Building Your First Project with Git Branching and Pull Requests.' This specificity helps participants understand exactly what they'll gain.</p><p>Content preparation involves creating a logical progression from basic concepts to practical application. I always include guided hands-on exercises, real-world examples, and common pitfalls to avoid. Materials are prepared in advance, with backup options for when things inevitably go wrong during live demos.</p><p>The workshop structure typically follows a pattern: concept introduction, demonstration, guided practice, independent challenge, and reflection. This format keeps engagement high while ensuring concepts are reinforced through practice.</p><p>Follow-up is equally important - providing resources for continued learning, gathering feedback for improvement, and creating channels for questions that arise after the session.</p><p>These principles have helped me create workshops that participants find both educational and enjoyable, with skills they can immediately apply to their own projects.</p>",
+      "image": "img/uploads/workshop-organization.jpg",
+      "certificate_pdf": null,
+      "slug": "how-i-approach-organizing-technical-workshops"
+    },
+    {
+      "title": "The Impact of Student-Led Technical Communities",
+      "content": "<p>Student-led technical communities play a vital role in complementing formal education with peer learning, practical experience, and networking opportunities. As someone deeply involved in these communities, I've witnessed their transformative impact firsthand.</p><p>These communities bridge the gap between classroom theory and industry practice. While courses teach fundamentals, student clubs often focus on current technologies, tools, and methodologies that are actively used in the industry. This exposure helps members stay current with rapidly evolving tech trends.</p><p>One of the most valuable aspects is the peer-to-peer learning model. Students are often more comfortable asking questions and expressing confusion with peers than with professors. This creates an environment where everyone teaches and everyone learns, reinforcing knowledge for both parties.</p><p>Leadership opportunities within these communities develop crucial soft skills that technical education often overlooks - public speaking, event management, team coordination, and conflict resolution. These skills prove invaluable when entering the professional world.</p><p>Perhaps most importantly, these communities foster a sense of belonging, especially for underrepresented groups in tech. Creating spaces where students can find mentorship, friendship, and support helps combat impostor syndrome and encourages persistence through challenging coursework.</p><p>As we continue building these spaces at NIET, I've seen firsthand how they transform hesitant beginners into confident developers and leaders ready to make their mark on the tech industry.</p>",
+      "image": "img/uploads/tech-communities.jpg",
+      "certificate_pdf": null,
+      "slug": "the-impact-of-student-led-technical-communities"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Python Developer Intern",
+      "company": "CodeClause",
+      "start_date": "2024-07-01",
+      "end_date": "2024-08-15",
+      "description": "During this intensive internship, I developed multiple mini-projects using Python that focused on problem-solving, automation, and GUI applications. I created a dynamic GUI-based music player using Tkinter and Pygame, offering intuitive navigation for audio file playback. Another major task involved building a web scraper capable of extracting data from dynamic websites, utilizing libraries like BeautifulSoup and requests. I also worked on automating email dispatches with attachments using Python's SMTP module, enhancing communication workflows.\n\nEach project required thoughtful planning, testing, debugging, and documentation. I practiced modular coding, version control with Git, and applied object-oriented principles extensively. Additionally, I regularly participated in code reviews and team sync-ups, gaining insights into collaborative development workflows. The internship enhanced my proficiency in backend scripting, exception handling, and delivering user-ready applications."
+    },
+    {
+      "title": "Virtual Intern",
+      "company": "Bharat Intern",
+      "start_date": "2022-08-05",
+      "end_date": "2022-09-10",
+      "description": "This early internship introduced me to practical programming with a focus on building simple yet functional applications. I developed a user-friendly calculator and a temperature conversion tool using Python with GUI components. The emphasis was on ensuring accurate computations, handling invalid input, and delivering clean user interfaces. The experience also introduced me to debugging techniques and basic UI design principles.\n\nIt marked my first experience working on tasks with deliverables and deadlines. I learned the importance of planning, documenting, and testing code before delivery. My familiarity with Python's GUI frameworks improved, and I became more comfortable implementing logic through graphical workflows. This foundational experience motivated me to explore advanced topics and tools, paving the way for my transition into more complex development projects."
+    },
+    {
+      "title": "Technical Head",
+      "company": "Ekume Club, NIET",
+      "start_date": "2024-04-01",
+      "end_date": null,
+      "description": "As the Technical Head of Ekume Club, I have led multiple technical initiatives that include the planning, coordination, and execution of events aimed at upskilling students in areas such as Git, Docker, deployment strategies, and AI. I designed hands-on content for sessions, mentored over 50 students, and helped integrate industry best practices into learning modules. I spearheaded the club's transition to more practical, project-based sessions, ensuring each workshop provided tangible takeaways. From technical guidance to logistics, I supervised the end-to-end delivery of sessions such as Deploy 101, Web Wizard, and AR in Snap, significantly raising the club's impact and visibility."
+    },
+    {
+      "title": "Technical Coordinator",
+      "company": "NIET Tech Fests",
+      "start_date": "2023-03-01",
+      "end_date": "2023-03-15",
+      "description": "As part of NIET's central event committee, I was responsible for coordinating backend logistics, setting up technical infrastructure, and facilitating inter-club communication during annual college tech fests. I contributed to the planning of 10+ technical events across various departments, handling participant registrations, live coding setups, and multimedia integration. I also managed backend systems for real-time leaderboards, timekeeping, and certificate generation. This role greatly enhanced my event management capabilities and strengthened my collaboration with faculty, developers, and designers."
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Rajesh Kumar",
+      "email": "rajesh@example.com",
+      "subject": "Project Collaboration",
+      "message": "Hi Ashish, I came across your portfolio and was impressed by your Flask projects. I'm working on a web application for my startup and would love to discuss potential collaboration. Can we schedule a call next week?",
+      "is_read": 0
+    },
+    {
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "subject": "Speaking Opportunity",
+      "message": "Hello! I'm organizing a tech workshop at Delhi University next month, and we're looking for speakers with experience in deployment and containerization. Would you be interested in giving a talk similar to your Deploy 101 workshop? Please let me know if you'd like more details.",
+      "is_read": 0
+    },
+    {
+      "name": "Vikram Singh",
+      "email": "vikram.singh@techstar.com",
+      "subject": "Internship Opportunity",
+      "message": "Dear Ashish, I'm a recruiter at TechStar Solutions. We're impressed by your project portfolio and achievements. We have summer internship positions open in our Python development team that might interest you. Please reply if you'd like to learn more about this opportunity.",
+      "is_read": 0
+    }
+  ],
+  "user": {
+    "username": "admin",
+    "password": "admin123",
+    "is_admin": 1,
+    "full_name": "Ashish Pal",
+    "email": "palbro86@gmail.com",
+    "phone": "+91-7428450179",
+    "location": "Greater Noida, India",
+    "github": "https://github.com/ashupal86",
+    "linkedin": "https://www.linkedin.com/in/ashish-pal-5725a6257"
+  }
+} 

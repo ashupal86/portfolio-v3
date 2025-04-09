@@ -13,6 +13,9 @@ import threading
 import time
 import requests
 import socket
+import json
+import zipfile
+from io import BytesIO
 
 # Function to get local IP address
 def get_local_ip():
@@ -95,6 +98,21 @@ def migrate_db():
     if 'certificate_pdf' not in columns:
         print("Adding certificate_pdf column to Achievement table...")
         cursor.execute("ALTER TABLE Achievement ADD COLUMN certificate_pdf TEXT")
+    
+    # Check if linkedin_url column exists in Achievement table
+    if 'linkedin_url' not in columns:
+        print("Adding linkedin_url column to Achievement table...")
+        cursor.execute("ALTER TABLE Achievement ADD COLUMN linkedin_url TEXT")
+    
+    # Check if event_type column exists in Achievement table
+    if 'event_type' not in columns:
+        print("Adding event_type column to Achievement table...")
+        cursor.execute("ALTER TABLE Achievement ADD COLUMN event_type TEXT")
+    
+    # Check if achievement_type column exists in Achievement table
+    if 'achievement_type' not in columns:
+        print("Adding achievement_type column to Achievement table...")
+        cursor.execute("ALTER TABLE Achievement ADD COLUMN achievement_type TEXT")
     
     # Check if certificate_pdf column exists in BlogPost table
     cursor.execute("PRAGMA table_info(BlogPost)")
@@ -438,10 +456,12 @@ def index():
     
     # Get achievements - handle date format issue by using strftime to format the date
     try:
+        # Fetch all achievements and events in one query
         achievements = db.execute(
-            '''SELECT id, title, description, image, certificate_pdf, 
+            '''SELECT id, title, description, image, certificate_pdf, linkedin_url, event_type, achievement_type,
                   strftime('%Y-%m-%d', date) as formatted_date 
-               FROM Achievement ORDER BY date DESC'''
+               FROM Achievement 
+               ORDER BY date DESC'''
         ).fetchall()
         
         # Convert achievements to a list of dictionaries with properly formatted dates
@@ -456,13 +476,46 @@ def index():
                     achievement_dict['date'] = datetime.strptime(achievement_dict['date'], '%Y-%m-%d')
                 except ValueError:
                     pass
+                    
+            # Add special flag for competition wins (used for styling)
+            if achievement_dict.get('achievement_type') == 'Competition' and ('1st' in achievement_dict.get('title', '') or 'Winner' in achievement_dict.get('title', '')):
+                achievement_dict['is_winner'] = True
+            else:
+                achievement_dict['is_winner'] = False
+                
+            # Add special flag for certifications (used for styling)
+            if achievement_dict.get('achievement_type') == 'Certification':
+                achievement_dict['is_certification'] = True
+            else:
+                achievement_dict['is_certification'] = False
+                
             formatted_achievements.append(achievement_dict)
+        
+        # Group achievements by type for the template
+        achievements_by_type = {}
+        for achievement in formatted_achievements:
+            if achievement.get('achievement_type'):
+                achievement_type = achievement.get('achievement_type', 'Other')
+                if achievement_type not in achievements_by_type:
+                    achievements_by_type[achievement_type] = []
+                achievements_by_type[achievement_type].append(achievement)
+            elif achievement.get('event_type'):
+                event_type = achievement.get('event_type', 'Other')
+                if event_type not in achievements_by_type:
+                    achievements_by_type[event_type] = []
+                achievements_by_type[event_type].append(achievement)
         
     except Exception as e:
         print(f"Error formatting achievement dates: {str(e)}")
         # Fallback to simpler query if there's an error
-        achievements = db.execute('SELECT id, title, description, image, certificate_pdf FROM Achievement').fetchall()
+        achievements = db.execute(
+            '''SELECT id, title, description, image, certificate_pdf, linkedin_url, event_type, achievement_type
+               FROM Achievement'''
+        ).fetchall()
         formatted_achievements = list(achievements)
+        achievements_by_type = {'Other': formatted_achievements}
+    
+    # Note: We no longer need a separate events query as we merged them into achievements
     
     # Get education - handle date format issue by using strftime to format the dates
     try:
@@ -505,6 +558,7 @@ def index():
                           featured_projects=featured_projects,
                           other_projects=other_projects,
                           achievements=formatted_achievements,
+                          achievements_by_type=achievements_by_type,
                           education=formatted_education,
                           blog_posts=blog_posts)
 
@@ -973,9 +1027,9 @@ def admin_add_project():
         db = get_db()
         db.execute(
             '''INSERT INTO Project 
-               (title, description, image, live_link, github_link, categories, featured, category) 
+               (title, description, image, github_link, live_link, categories, category, featured) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-            (title, description, image, url, github_url, technologies, featured, category)
+            (title, description, image, github_url, url, technologies, category, featured)
         )
         db.commit()
         
@@ -1011,10 +1065,9 @@ def admin_edit_project(id):
             
         db.execute(
             '''UPDATE Project 
-               SET title = ?, description = ?, image = ?, live_link = ?, 
-                   github_link = ?, categories = ?, featured = ?, category = ? 
+               SET title = ?, description = ?, image = ?, github_link = ?, live_link = ?, categories = ?, featured = ?, category = ?
                WHERE id = ?''',
-            (title, description, image, url, github_url, technologies, featured, category, id)
+            (title, description, image, github_url, url, technologies, featured, category, id)
         )
         db.commit()
         
@@ -1327,6 +1380,8 @@ def admin_mark_message_read(id):
 @admin_required
 def admin_logger():
     """View application logs."""
+    from flask import request
+    
     log_files = {
         'app.log': 'Application Logs',
         'gunicorn-access.log': 'Gunicorn Access Logs',
@@ -1338,35 +1393,42 @@ def admin_logger():
     
     if selected_log in log_files:
         log_path = os.path.join('logs', selected_log)
-        if os.path.exists(log_path):
-            try:
-                with open(log_path, 'r') as f:
-                    # Read last 1000 lines of logs
-                    lines = f.readlines()[-1000:]
-                    
-                    # Format logs based on the type
-                    if selected_log == 'gunicorn-access.log':
-                        # Format: IP - - [timestamp] "METHOD /path HTTP/1.1" status_code size
-                        logs = []
-                        for line in lines:
-                            try:
+        
+        # Create the log file if it doesn't exist
+        os.makedirs('logs', exist_ok=True)
+        if not os.path.exists(log_path):
+            with open(log_path, 'w') as f:
+                f.write(f"Log file {selected_log} created on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            
+        try:
+            with open(log_path, 'r') as f:
+                # Read last 1000 lines of logs
+                lines = f.readlines()[-1000:]
+                
+                # Format logs based on the type
+                if selected_log == 'gunicorn-access.log':
+                    # Format: IP - - [timestamp] "METHOD /path HTTP/1.1" status_code size
+                    logs = []
+                    for line in lines:
+                        try:
+                            if ' - - [' in line and '" ' in line:
                                 timestamp = line.split('[')[1].split(']')[0]
                                 request = line.split('"')[1]
                                 status = line.split('" ')[1].split(' ')[0]
                                 logs.append(f"{timestamp} - {request} - Status: {status}")
-                            except IndexError:
+                            else:
                                 logs.append(line)
-                    elif selected_log == 'gunicorn-error.log':
-                        # Keep error logs as is, they're already well formatted
-                        logs = lines
-                    else:
-                        # Application logs
-                        logs = lines
-            except Exception as e:
-                error_msg = f"Error reading log file: {str(e)}"
-                logs = [error_msg]
-        else:
-            logs = ["No logs found"]
+                        except IndexError:
+                            logs.append(line)
+                elif selected_log == 'gunicorn-error.log':
+                    # Keep error logs as is, they're already well formatted
+                    logs = lines
+                else:
+                    # Application logs
+                    logs = lines
+        except Exception as e:
+            error_msg = f"Error reading log file: {str(e)}"
+            logs = [error_msg]
     
     return render_template('admin/logger.html', 
                          logs=logs, 
@@ -1435,6 +1497,41 @@ def upload_file():
     app.logger.warning(f'Invalid file type attempted: {file.filename}')
     return jsonify({'error': 'File type not allowed'}), 400
 
+# Add a route to view a single achievement
+@app.route('/achievement/<int:id>')
+def view_achievement(id):
+    """View a single achievement in its own page."""
+    db = get_db()
+    achievement = db.execute('SELECT * FROM Achievement WHERE id = ?', (id,)).fetchone()
+    
+    if achievement is None:
+        flash('Achievement not found', 'danger')
+        return redirect(url_for('index'))
+    
+    # Convert to dictionary to add properties
+    achievement_dict = dict(achievement)
+    
+    # Format date if present
+    if achievement_dict.get('date'):
+        try:
+            achievement_dict['date'] = datetime.strptime(achievement_dict['date'], '%Y-%m-%d')
+        except (ValueError, TypeError):
+            pass
+    
+    # Add special flag for competition wins (used for styling)
+    if achievement_dict.get('achievement_type') == 'Competition' and ('1st' in achievement_dict.get('title', '') or 'Winner' in achievement_dict.get('title', '')):
+        achievement_dict['is_winner'] = True
+    else:
+        achievement_dict['is_winner'] = False
+        
+    # Add special flag for certifications (used for styling)
+    if achievement_dict.get('achievement_type') == 'Certification':
+        achievement_dict['is_certification'] = True
+    else:
+        achievement_dict['is_certification'] = False
+    
+    return render_template('achievement_detail.html', achievement=achievement_dict)
+
 # Add a route to serve PDF files for viewing in the browser
 @app.route('/view-certificate/<path:filename>')
 def view_certificate(filename):
@@ -1463,12 +1560,425 @@ def alive():
     app.logger.info("Alive check received")
     return jsonify({"status": "alive", "timestamp": datetime.now().isoformat()})
 
+@app.route('/admin/seed-database', methods=['GET', 'POST'])
+@login_required
+def admin_seed_database():
+    """Seed the database with data from portfolio_data.json."""
+    if request.method == 'POST':
+        try:
+            # Get form data
+            clear_existing = request.form.get('clear_existing') == 'on'
+            
+            # Load the JSON data
+            json_path = 'portfolio_data.json'
+            if not os.path.exists(json_path):
+                flash(f"Error: {json_path} not found.", 'danger')
+                return redirect(url_for('admin_seed_database'))
+                
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            db = get_db()
+            cursor = db.cursor()
+            
+            # Insert About data
+            if 'about' in data and data['about']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM About')
+                cursor.execute(
+                    'INSERT INTO About (content) VALUES (?)',
+                    (data['about']['content'],)
+                )
+            
+            # Insert Skills
+            if 'skills' in data and data['skills']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM Skill')
+                for skill in data['skills']:
+                    cursor.execute(
+                        'INSERT INTO Skill (name, category, proficiency, icon, display_order) VALUES (?, ?, ?, ?, ?)',
+                        (skill['name'], skill['category'], skill['proficiency'], skill['icon'], skill['display_order'])
+                    )
+            
+            # Insert Projects
+            if 'projects' in data and data['projects']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM Project')
+                for project in data['projects']:
+                    cursor.execute(
+                        '''INSERT INTO Project 
+                           (title, description, image, github_link, live_link, categories, category, featured) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                        (project['title'], project['description'], project['image'], 
+                         project.get('github_link', ''), project.get('live_link', ''), 
+                         project.get('categories', ''), project.get('category', ''), 
+                         project.get('featured', 0))
+                    )
+            
+            # Check if Achievement table has linkedin_url column, if not add it
+            cursor.execute("PRAGMA table_info(Achievement)")
+            achievement_columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'linkedin_url' not in achievement_columns:
+                try:
+                    cursor.execute('ALTER TABLE Achievement ADD COLUMN linkedin_url TEXT')
+                except:
+                    pass  # Column might already exist
+            
+            # Insert Achievements
+            if 'achievements' in data and data['achievements']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM Achievement')
+                for achievement in data['achievements']:
+                    cursor.execute(
+                        'INSERT INTO Achievement (title, description, date, image, certificate_pdf, linkedin_url, event_type, achievement_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                        (achievement['title'], achievement['description'], achievement['date'], 
+                         achievement['image'], achievement['certificate_pdf'], achievement.get('linkedin_url', ''), '', 
+                         achievement.get('achievement_type', 'Award'))
+                    )
+            
+            # Insert Events
+            if 'events' in data and data['events']:
+                # Only clear if not already cleared by achievements
+                if clear_existing and ('achievements' not in data or not data['achievements']):
+                    cursor.execute('DELETE FROM Achievement')
+                for event in data['events']:
+                    cursor.execute(
+                        'INSERT INTO Achievement (title, description, date, image, certificate_pdf, linkedin_url, event_type, achievement_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                        (event['title'], event['description'], event['date'], 
+                         event['image'], event['certificate_pdf'], event.get('linkedin_url', ''), event.get('event_type', 'Attended'), '')
+                    )
+            
+            # Insert Education
+            if 'education' in data and data['education']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM Education')
+                for education in data['education']:
+                    cursor.execute(
+                        '''INSERT INTO Education 
+                           (institution, degree, field, start_date, end_date, description) 
+                           VALUES (?, ?, ?, ?, ?, ?)''',
+                        (education['institution'], education['degree'], education['field'],
+                         education['start_date'], education.get('end_date'), education['description'])
+                    )
+            
+            # Insert Blog Posts
+            if 'blog_posts' in data and data['blog_posts']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM BlogPost')
+                for post in data['blog_posts']:
+                    cursor.execute(
+                        '''INSERT INTO BlogPost 
+                           (title, content, image, certificate_pdf, created_at, updated_at, slug) 
+                           VALUES (?, ?, ?, ?, datetime('now'), datetime('now'), ?)''',
+                        (post['title'], post['content'], post.get('image', ''), 
+                         post.get('certificate_pdf'), post['slug'])
+                    )
+            
+            # Insert Contacts
+            if 'contacts' in data and data['contacts']:
+                if clear_existing:
+                    cursor.execute('DELETE FROM Contact')
+                for contact in data['contacts']:
+                    cursor.execute(
+                        'INSERT INTO Contact (name, email, subject, message, created_at, is_read) VALUES (?, ?, ?, ?, datetime("now"), ?)',
+                        (contact['name'], contact['email'], contact['subject'], 
+                         contact['message'], contact.get('is_read', 0))
+                    )
+            
+            # Insert User if not exists
+            if 'user' in data and data['user']:
+                existing_user = cursor.execute(
+                    'SELECT id FROM User WHERE username = ?', 
+                    (data['user']['username'],)
+                ).fetchone()
+                
+                if not existing_user:
+                    # Hash the password before storing it
+                    hashed_password = generate_password_hash(data['user']['password'])
+                    cursor.execute(
+                        'INSERT INTO User (username, password, is_admin) VALUES (?, ?, ?)',
+                        (data['user']['username'], hashed_password, data['user']['is_admin'])
+                    )
+            
+            db.commit()
+            flash('Database seeded successfully!', 'success')
+            return redirect(url_for('admin_dashboard'))
+            
+        except Exception as e:
+            flash(f'Error seeding database: {str(e)}', 'danger')
+            return redirect(url_for('admin_seed_database'))
+    
+    return render_template('admin/seed_database.html')
+
+@app.route('/admin/education')
+@admin_required
+def admin_education():
+    """List all education entries."""
+    db = get_db()
+    education_entries = db.execute('SELECT * FROM Education ORDER BY start_date DESC').fetchall()
+    return render_template('admin/education.html', education_entries=education_entries)
+
+@app.route('/admin/education/add', methods=['GET', 'POST'])
+@admin_required
+def admin_add_education():
+    """Add a new education entry."""
+    if request.method == 'POST':
+        institution = request.form.get('institution')
+        degree = request.form.get('degree')
+        field = request.form.get('field')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date', '')  # Optional
+        description = request.form.get('description', '')  # Optional
+        
+        if not all([institution, degree, field, start_date]):
+            flash('Institution, degree, field, and start date are required.', 'warning')
+            return redirect(url_for('admin_add_education'))
+            
+        db = get_db()
+        db.execute(
+            'INSERT INTO Education (institution, degree, field, start_date, end_date, description) VALUES (?, ?, ?, ?, ?, ?)',
+            (institution, degree, field, start_date, end_date, description)
+        )
+        db.commit()
+        
+        flash('Education entry added successfully.', 'success')
+        return redirect(url_for('admin_education'))
+        
+    return render_template('admin/education_form.html')
+
+@app.route('/admin/education/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_education(id):
+    """Edit an existing education entry."""
+    db = get_db()
+    education = db.execute('SELECT * FROM Education WHERE id = ?', (id,)).fetchone()
+    
+    if education is None:
+        flash('Education entry not found.', 'danger')
+        return redirect(url_for('admin_education'))
+    
+    if request.method == 'POST':
+        institution = request.form.get('institution')
+        degree = request.form.get('degree')
+        field = request.form.get('field')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date', '')  # Optional
+        description = request.form.get('description', '')  # Optional
+        
+        if not all([institution, degree, field, start_date]):
+            flash('Institution, degree, field, and start date are required.', 'warning')
+            return redirect(url_for('admin_edit_education', id=id))
+            
+        db.execute(
+            '''UPDATE Education 
+               SET institution = ?, degree = ?, field = ?, start_date = ?, end_date = ?, description = ?
+               WHERE id = ?''',
+            (institution, degree, field, start_date, end_date, description, id)
+        )
+        db.commit()
+        
+        flash('Education entry updated successfully.', 'success')
+        return redirect(url_for('admin_education'))
+        
+    return render_template('admin/education_form.html', education=education)
+
+@app.route('/admin/education/<int:id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_education(id):
+    """Delete an education entry."""
+    db = get_db()
+    education = db.execute('SELECT * FROM Education WHERE id = ?', (id,)).fetchone()
+    
+    if education is None:
+        flash('Education entry not found.', 'danger')
+        return redirect(url_for('admin_education'))
+        
+    db.execute('DELETE FROM Education WHERE id = ?', (id,))
+    db.commit()
+    
+    flash('Education entry deleted successfully.', 'success')
+    return redirect(url_for('admin_education'))
+
+@app.route('/admin/export-data')
+@admin_required
+def admin_export_data():
+    """Export portfolio data as JSON file."""
+    db = get_db()
+    
+    # Build the complete portfolio data dictionary
+    portfolio_data = {}
+    
+    # Get about data
+    about = db.execute('SELECT * FROM About ORDER BY id DESC LIMIT 1').fetchone()
+    if about:
+        portfolio_data['about'] = {
+            'content': about['content']
+        }
+    
+    # Get skills data
+    skills = db.execute('SELECT * FROM Skill ORDER BY display_order').fetchall()
+    portfolio_data['skills'] = []
+    for skill in skills:
+        portfolio_data['skills'].append({
+            'name': skill['name'],
+            'category': skill['category'],
+            'proficiency': skill['proficiency'],
+            'icon': skill['icon'],
+            'display_order': skill['display_order']
+        })
+    
+    # Get projects data
+    projects = db.execute('SELECT * FROM Project ORDER BY created_at DESC').fetchall()
+    portfolio_data['projects'] = []
+    for project in projects:
+        portfolio_data['projects'].append({
+            'title': project['title'],
+            'description': project['description'],
+            'image': project['image'],
+            'github_link': project['github_link'],
+            'live_link': project['live_link'],
+            'categories': project['categories'],
+            'featured': project['featured'] == 1
+        })
+    
+    # Get achievements data
+    achievements = db.execute('SELECT * FROM Achievement ORDER BY date DESC').fetchall()
+    portfolio_data['achievements'] = []
+    for achievement in achievements:
+        portfolio_data['achievements'].append({
+            'title': achievement['title'],
+            'description': achievement['description'],
+            'date': achievement['date'].isoformat() if achievement['date'] else None,
+            'image': achievement['image'],
+            'certificate_pdf': achievement['certificate_pdf'],
+            'linkedin_url': achievement['linkedin_url']
+        })
+    
+    # Get education data
+    education_items = db.execute('SELECT * FROM Education ORDER BY start_date DESC').fetchall()
+    portfolio_data['education'] = []
+    for edu in education_items:
+        portfolio_data['education'].append({
+            'institution': edu['institution'],
+            'degree': edu['degree'],
+            'field': edu['field'],
+            'description': edu['description'],
+            'start_date': edu['start_date'].isoformat() if edu['start_date'] else None,
+            'end_date': edu['end_date'].isoformat() if edu['end_date'] else None
+        })
+    
+    # Get blog posts data
+    blog_posts = db.execute('SELECT * FROM BlogPost ORDER BY created_at DESC').fetchall()
+    portfolio_data['blog_posts'] = []
+    for post in blog_posts:
+        portfolio_data['blog_posts'].append({
+            'title': post['title'],
+            'slug': post['slug'],
+            'content': post['content'],
+            'image': post['image'],
+            'created_at': post['created_at'].isoformat() if post['created_at'] else None
+        })
+    
+    # Create response with JSON data
+    response = jsonify(portfolio_data)
+    response.headers.set('Content-Disposition', 'attachment', filename='portfolio_data.json')
+    return response
+
+@app.route('/admin/download-log/<filename>')
+@admin_required
+def admin_download_log(filename):
+    """Download a log file."""
+    log_files = ['app.log', 'gunicorn-access.log', 'gunicorn-error.log']
+    
+    if filename not in log_files:
+        flash('Invalid log file requested.', 'danger')
+        return redirect(url_for('admin_logger'))
+    
+    log_path = os.path.join('logs', filename)
+    if not os.path.exists(log_path):
+        flash(f'Log file {filename} does not exist.', 'danger')
+        return redirect(url_for('admin_logger'))
+    
+    return send_from_directory('logs', filename, as_attachment=True)
+
+@app.route('/admin/download-database')
+@admin_required
+def admin_download_database():
+    """Download the database file for backup."""
+    # Create a copy of the database to avoid locking issues
+    db_path = app.config['DATABASE']
+    backup_path = os.path.join('instance', 'portfolio_backup.db')
+    
+    try:
+        # Close the database connection
+        if 'db' in g:
+            g.db.close()
+            g.pop('db', None)
+        
+        # Copy the database file
+        with open(db_path, 'rb') as src, open(backup_path, 'wb') as dst:
+            dst.write(src.read())
+        
+        # Set the response headers
+        response = send_from_directory('instance', 'portfolio_backup.db', as_attachment=True)
+        response.headers['Content-Disposition'] = f'attachment; filename=portfolio_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db'
+        
+        return response
+    except Exception as e:
+        flash(f'Error creating database backup: {str(e)}', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/download-all-logs')
+@admin_required
+def admin_download_all_logs():
+    """Download all log files as a zip archive."""
+    # Create a BytesIO object to store the zip file
+    memory_file = BytesIO()
+    
+    # Define the log files to include
+    log_files = ['app.log', 'gunicorn-access.log', 'gunicorn-error.log']
+    
+    # Create a zip file
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for log_file in log_files:
+            log_path = os.path.join('logs', log_file)
+            if os.path.exists(log_path):
+                # Add the file to the zip
+                zf.write(log_path, arcname=log_file)
+    
+    # Reset the file pointer
+    memory_file.seek(0)
+    
+    # Set the response headers
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    response = app.response_class(
+        memory_file.getvalue(),
+        mimetype='application/zip',
+        headers={'Content-Disposition': f'attachment;filename=all_logs_{timestamp}.zip'}
+    )
+    
+    return response
+
 # Start the keep-alive thread when the application starts
 if __name__ == '__main__':
+    # Create tables if they don't exist
+    with app.app_context():
+        create_tables()
+        
+    # Create log directory if it doesn't exist
+    os.makedirs('logs', exist_ok=True)
+    
+    # Create empty log files if they don't exist
+    log_files = ['app.log', 'gunicorn-access.log', 'gunicorn-error.log']
+    for log_file in log_files:
+        log_path = os.path.join('logs', log_file)
+        if not os.path.exists(log_path):
+            with open(log_path, 'w') as f:
+                f.write(f"Log file created on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    
     # Start the keep-alive thread
     keep_alive_thread = threading.Thread(target=keep_alive, daemon=True)
     keep_alive_thread.start()
     
-    # Only enable debug mode when running directly with Python
-    # This prevents automatic reloading when running with Gunicorn
-    app.run(host='0.0.0.0', port=5000, debug=False) 
+    app.run(host='0.0.0.0', port=5000, debug=True) 

@@ -202,5 +202,102 @@
             </div>
         </div>
     </div>
+
+    <!-- Add the Seed Database card to the Admin Tools section -->
+    <div class="col-md-6 mb-4">
+        <div class="comic-panel h-100">
+            <div class="card-body">
+                <h5 class="card-title bangers-font">
+                    <i class="fas fa-database me-2"></i> Seed Database
+                </h5>
+                <p class="card-text">Populate the database with predefined data from JSON file.</p>
+                <a href="{{ url_for('admin_seed_database') }}" class="btn btn-primary">
+                    <i class="fas fa-database me-2"></i> Seed Database
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add the Server Logs card to the Admin Tools section -->
+    <div class="col-md-6 mb-4">
+        <div class="comic-panel h-100">
+            <div class="card-body">
+                <h5 class="card-title bangers-font">
+                    <i class="fas fa-file-alt me-2"></i> Server Logs
+                </h5>
+                <p class="card-text">View or download application and server logs for troubleshooting.</p>
+                <div class="d-flex flex-wrap">
+                    <a href="{{ url_for('admin_download_all_logs') }}" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-download me-2"></i> Download All Logs
+                    </a>
+                    <div class="d-flex w-100">
+                        <a href="{{ url_for('admin_logger') }}" class="btn btn-primary me-2 flex-grow-1">
+                            <i class="fas fa-eye me-2"></i> View Logs
+                        </a>
+                        <div class="dropdown flex-grow-1">
+                            <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-alt me-2"></i> Select Log
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% set log_files = {'app.log': 'Application Logs', 'gunicorn-access.log': 'Access Logs', 'gunicorn-error.log': 'Error Logs'} %}
+                                {% for log_file, log_name in log_files.items() %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('admin_download_log', filename=log_file) }}">
+                                            {{ log_name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Education Management -->
+    <div class="col-md-6 mb-4">
+        <div class="comic-panel h-100">
+            <div class="card-body">
+                <h5 class="card-title bangers-font">
+                    <i class="fas fa-graduation-cap me-2"></i> Education
+                </h5>
+                <p class="card-text">Manage your educational background information.</p>
+                <a href="{{ url_for('admin_education') }}" class="btn btn-primary">
+                    <i class="fas fa-graduation-cap me-2"></i> Manage Education
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Portfolio Data -->
+    <div class="col-md-6 mb-4">
+        <div class="comic-panel h-100">
+            <div class="card-body">
+                <h5 class="card-title bangers-font">
+                    <i class="fas fa-file-export me-2"></i> Export Data
+                </h5>
+                <p class="card-text">Download a backup of all your portfolio data in JSON format.</p>
+                <a href="{{ url_for('admin_export_data') }}" class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i> Download Data
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Backup -->
+    <div class="col-md-6 mb-4">
+        <div class="comic-panel h-100">
+            <div class="card-body">
+                <h5 class="card-title bangers-font">
+                    <i class="fas fa-database me-2"></i> Database Backup
+                </h5>
+                <p class="card-text">Download a full backup of your database file for safekeeping.</p>
+                <a href="{{ url_for('admin_download_database') }}" class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i> Download Database
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %} 

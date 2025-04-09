@@ -9,20 +9,34 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">{{ log_files[selected_log] }}</h6>
-            <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="logFileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    Select Log File
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="logFileDropdown">
-                    {% for log_file, log_name in log_files.items() %}
-                    <li>
-                        <a class="dropdown-item {% if log_file == selected_log %}active{% endif %}" 
-                           href="{{ url_for('admin_logger', log=log_file) }}">
-                            {{ log_name }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('admin_download_all_logs') }}" class="btn btn-success me-2">
+                    <i class="fas fa-file-archive me-1"></i> Download All Logs
+                </a>
+                <a href="{{ url_for('admin_download_log', filename=selected_log) }}" class="btn btn-outline-success me-2">
+                    <i class="fas fa-download me-1"></i> Current Log
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="logFileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Log File
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="logFileDropdown">
+                        {% for log_file, log_name in log_files.items() %}
+                        <li>
+                            <div class="d-flex justify-content-between align-items-center px-2">
+                                <a class="dropdown-item {% if log_file == selected_log %}active{% endif %}" 
+                                   href="{{ url_for('admin_logger', log=log_file) }}">
+                                    {{ log_name }}
+                                </a>
+                                <a href="{{ url_for('admin_download_log', filename=log_file) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Download {{ log_name }}">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="card-body">

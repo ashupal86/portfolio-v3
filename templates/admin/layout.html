@@ -21,16 +21,76 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* Additional responsive styling for admin dashboard */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -250px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 999;
+                transition: all 0.3s;
+                overflow-y: auto;
+            }
+            
+            #sidebar.active {
+                margin-left: 0;
+            }
+            
+            #content {
+                width: 100%;
+                transition: all 0.3s;
+            }
+            
+            .mobile-nav-toggle {
+                display: block !important;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1000;
+                background: var(--bs-primary);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 10px 12px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
 </head>
 <body class="admin-body">
+    <!-- Mobile Navigation Toggle Button -->
+    <button class="mobile-nav-toggle d-md-none">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Overlay for sidebar on mobile -->
+    <div class="overlay"></div>
+    
     <div class="admin-wrapper">
         <!-- Sidebar -->
         <nav id="sidebar" class="comic-panel">
-            <div class="sidebar-header">
+            <div class="sidebar-header d-flex justify-content-between align-items-center">
                 <h3 class="bangers-font">Portfolio Admin</h3>
-                <button id="sidebarCollapseBtn" class="btn btn-sm d-md-none">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button class="btn-close text-reset d-md-none" aria-label="Close sidebar"></button>
             </div>
             
             <div class="sidebar-user text-center mb-4">
@@ -75,7 +135,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if 'education' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('admin_education') }}" class="nav-link {% if 'education' in request.endpoint %}active{% endif %}">
                         <i class="fas fa-graduation-cap me-2"></i> Education
                     </a>
                 </li>
@@ -121,9 +181,7 @@
             <!-- Topbar -->
             <nav class="navbar navbar-expand navbar-dark mb-4">
                 <div class="container-fluid">
-                    <button id="sidebarCollapse" class="btn btn-dark d-none d-md-block">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                    <!-- Remove the sidebarCollapse button completely since it's not needed -->
                     
                     <div class="ms-auto d-flex">
                         <div class="navbar-text me-3">
@@ -180,33 +238,60 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             
-            // Sidebar toggle
-            const sidebarCollapse = document.getElementById('sidebarCollapse');
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            // Sidebar toggle elements
             const sidebar = document.getElementById('sidebar');
-            const content = document.getElementById('content');
+            const overlay = document.querySelector('.overlay');
+            const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+            const closeSidebarBtn = document.querySelector('.btn-close');
             
+            // Function to toggle sidebar on mobile only
             function toggleSidebar() {
                 sidebar.classList.toggle('active');
-                content.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                // For accessibility
+                const expanded = sidebar.classList.contains('active');
+                mobileNavToggle.setAttribute('aria-expanded', expanded);
             }
             
-            if (sidebarCollapse) {
-                sidebarCollapse.addEventListener('click', toggleSidebar);
+            // Mobile sidebar toggle
+            if (mobileNavToggle) {
+                mobileNavToggle.addEventListener('click', toggleSidebar);
             }
             
-            if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.addEventListener('click', toggleSidebar);
+            // Close sidebar when clicking close button
+            if (closeSidebarBtn) {
+                closeSidebarBtn.addEventListener('click', toggleSidebar);
             }
+            
+            // Close sidebar when clicking on overlay
+            if (overlay) {
+                overlay.addEventListener('click', toggleSidebar);
+            }
+            
+            // Close sidebar when clicking on a nav link (mobile only)
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        toggleSidebar();
+                    }
+                });
+            });
             
             // Active nav highlight
             const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
-            
             navLinks.forEach(link => {
                 const linkPath = link.getAttribute('href');
                 if (currentPath === linkPath) {
                     link.classList.add('active');
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    overlay.classList.remove('active');
                 }
             });
         });

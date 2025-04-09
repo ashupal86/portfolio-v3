@@ -20,115 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Setup achievement cards and modals
-    setupAchievementCards();
-    
-    /**
-     * Handle navigation link clicks for smooth scrolling and section display
-     */
-    function setupNavigation() {
-        // Handle both in-page nav links and navbar links that point to sections
-        const inPageNavLinks = document.querySelectorAll('.nav-link[href^="#"]');
-        const navbarSectionLinks = document.querySelectorAll('.navbar-nav .nav-link[href*="#"]');
-        
-        // Function to extract section ID from href
-        function getSectionId(href) {
-            // Handle both "#section" and "index.html#section" type URLs
-            const hashIndex = href.indexOf('#');
-            if (hashIndex !== -1) {
-                return href.substring(hashIndex + 1);
-            }
-            return null;
-        }
-        
-        // Function to handle navigation clicks
-        function handleNavClick(e, targetId) {
-            e.preventDefault();
-            
-            const targetSection = document.getElementById(targetId);
-            
-            if (targetSection) {
-                // Hide all sections except the target
-                showOnlySection(targetSection);
-                
-                // Smooth scroll to the section
-                window.scrollTo({
-                    top: targetSection.offsetTop - 80, // Adjust for navbar height
-                    behavior: 'smooth'
-                });
-                
-                // Update active state in navbar
-                updateActiveNav(this);
-                
-                // Close mobile navbar if open
-                const navbarCollapse = document.querySelector('.navbar-collapse');
-                if (navbarCollapse && navbarCollapse.classList.contains('show')) {
-                    document.querySelector('.navbar-toggler').click();
-                }
-            }
-        }
-        
-        // Handle in-page navigation links
-        inPageNavLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href').substring(1);
-                handleNavClick.call(this, e, targetId);
-            });
-        });
-        
-        // Handle navbar links that point to sections
-        navbarSectionLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Only process links pointing to the current page with a hash
-                if (link.getAttribute('href').includes('#')) {
-                    const targetId = getSectionId(link.getAttribute('href'));
-                    if (targetId) {
-                        handleNavClick.call(this, e, targetId);
-                    }
-                }
-            });
-        });
-        
-        // Handle initial page load - show first section or hash section
-        if (window.location.hash) {
-            const targetId = window.location.hash.substring(1);
-            const targetSection = document.getElementById(targetId);
-            
-            if (targetSection) {
-                showOnlySection(targetSection);
-                const targetLink = document.querySelector(`.nav-link[href*="#${targetId}"]`);
-                if (targetLink) updateActiveNav(targetLink);
-            } else {
-                showOnlySection(sections[0]);
-            }
-        } else {
-            // On first load, show only the first section (hero section)
-            showOnlySection(sections[0]);
-        }
-    }
+    // === Section visibility is now handled by layout.html navigation script ===
     
     /**
      * Show only the target section and hide others
+     * This is now only used for section-specific initialization
      */
-    function showOnlySection(targetSection) {
-        if (currentSection === targetSection) return;
-        
-        // Store the new current section
-        currentSection = targetSection;
-        
-        // Hide all sections with a fade out
-        sections.forEach(section => {
-            if (section !== targetSection) {
-                section.style.display = 'none';
-                section.classList.remove('fade-in');
-            }
-        });
-        
-        // Show target section with a fade in
-        targetSection.style.display = 'block';
-        setTimeout(() => {
-            targetSection.classList.add('fade-in');
-        }, 50);
+    function showSection(targetSection) {
+        if (!targetSection) return;
         
         // Initialize specific features based on the section
         initializeSectionFeatures(targetSection);
@@ -136,11 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     /**
      * Update active state in navbar
+     * Note: This is now handled by layout.html navigation script
      */
     function updateActiveNav(activeLink) {
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => link.classList.remove('active'));
-        activeLink.classList.add('active');
+        // Left for compatibility, but actual navigation is handled in layout.html
+        console.log('Active nav updated:', activeLink);
     }
     
     /**
@@ -158,7 +57,14 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (sectionId === 'projects') {
             // Initialize project filters if present
             initializeProjectFilters();
+        } else if (sectionId === 'achievements') {
+            // No filter initialization needed anymore as we removed the filters
+            // Just animate the achievement cards
+            setupIntersectionObserver();
         }
+        
+        // Initialize skills section
+        initializeSkillsSection();
     }
     
     /**
@@ -455,221 +361,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    /**
-     * Setup achievement cards with modal functionality
-     */
-    function setupAchievementCards() {
-        const achievementCards = document.querySelectorAll('.achievement-card');
-        const achievementModal = document.getElementById('achievementModal');
-        
-        if (!achievementCards.length || !achievementModal) return;
-        
-        let bsModal = null;
-        
-        // Check if Bootstrap is available
-        if (typeof bootstrap !== 'undefined') {
-            try {
-                // Initialize modal properly
-                bsModal = new bootstrap.Modal(achievementModal, {
-                    backdrop: true,
-                    keyboard: true,
-                    focus: true
-                });
-                
-                // Make sure the modal can be closed
-                achievementModal.addEventListener('hide.bs.modal', function () {
-                    document.body.classList.remove('modal-open');
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) {
-                        backdrop.parentNode.removeChild(backdrop);
-                    }
-                });
-            } catch (e) {
-                console.error('Failed to initialize modal:', e);
-                return;
-            }
-        } else {
-            console.error('Bootstrap is not available. Modals will not work.');
-            return;
-        }
-        
-        // Add click event to each achievement card
-        achievementCards.forEach(card => {
-            // Add hover effect
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px)';
-                this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.3)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(-5px)';
-                this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.2)';
-            });
-            
-            // Add click handler
-            card.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                try {
-                    const title = this.querySelector('.achievement-title').textContent;
-                    const description = this.querySelector('.achievement-description').textContent;
-                    
-                    // Get image if exists
-                    let imageSrc = null;
-                    const imageElement = this.querySelector('.achievement-img');
-                    if (imageElement) {
-                        imageSrc = imageElement.getAttribute('src');
-                    }
-                    
-                    // Get date if exists
-                    let dateText = '';
-                    const dateElement = this.querySelector('.achievement-date-badge');
-                    if (dateElement) {
-                        dateText = dateElement.textContent.trim();
-                    }
-                    
-                    // Get certificate PDF if exists
-                    let certificatePdf = null;
-                    const certificateSection = this.querySelector('.achievement-certificate');
-                    if (certificateSection) {
-                        const downloadLink = certificateSection.querySelector('a[download]');
-                        if (downloadLink) {
-                            certificatePdf = downloadLink.getAttribute('href');
-                        }
-                    }
-                    
-                    // Update modal content
-                    const modalTitle = document.getElementById('achievementModalTitle');
-                    const modalDescription = document.getElementById('modalDescription'); 
-                    
-                    if (modalTitle) modalTitle.textContent = title;
-                    if (modalDescription) modalDescription.textContent = description;
-                    
-                    // Update image container
-                    const imageContainer = document.getElementById('modalImageContainer');
-                    if (imageContainer) {
-                        imageContainer.innerHTML = '';
-                        
-                        if (imageSrc) {
-                            const img = document.createElement('img');
-                            img.src = imageSrc;
-                            img.alt = title;
-                            img.className = 'img-fluid achievement-modal-img';
-                            imageContainer.appendChild(img);
-                        } else {
-                            const placeholder = document.createElement('div');
-                            placeholder.className = 'achievement-modal-placeholder d-flex align-items-center justify-content-center';
-                            const icon = document.createElement('i');
-                            icon.className = 'fas fa-trophy fa-5x text-primary';
-                            placeholder.appendChild(icon);
-                            imageContainer.appendChild(placeholder);
-                        }
-                        
-                        // Add date if available
-                        if (dateText) {
-                            const dateDiv = document.createElement('div');
-                            dateDiv.className = 'achievement-modal-date mt-2';
-                            const dateIcon = document.createElement('i');
-                            dateIcon.className = 'fas fa-calendar-alt me-1';
-                            dateDiv.appendChild(dateIcon);
-                            dateDiv.appendChild(document.createTextNode(dateText));
-                            imageContainer.appendChild(dateDiv);
-                        }
-                        
-                        // Add certificate buttons if available
-                        if (certificatePdf) {
-                            // Extract filename from path
-                            const filename = certificatePdf.split('/').pop();
-                            
-                            const certificateDiv = document.createElement('div');
-                            certificateDiv.className = 'achievement-modal-certificates';
-                            
-                            const certificateTitle = document.createElement('h5');
-                            certificateTitle.className = 'mb-2';
-                            certificateTitle.innerHTML = '<i class="fas fa-certificate me-1"></i> Certificate';
-                            certificateDiv.appendChild(certificateTitle);
-                            
-                            const buttonGroup = document.createElement('div');
-                            buttonGroup.className = 'btn-group';
-                            
-                            // Download button
-                            const downloadBtn = document.createElement('a');
-                            downloadBtn.href = certificatePdf;
-                            downloadBtn.className = 'btn btn-sm btn-primary';
-                            downloadBtn.setAttribute('download', '');
-                            downloadBtn.innerHTML = '<i class="fas fa-download me-1"></i> Download';
-                            buttonGroup.appendChild(downloadBtn);
-                            
-                            // View button
-                            const viewBtn = document.createElement('a');
-                            viewBtn.href = `/view-certificate/${filename}`;
-                            viewBtn.className = 'btn btn-sm btn-outline-info';
-                            viewBtn.setAttribute('target', '_blank');
-                            viewBtn.innerHTML = '<i class="fas fa-eye me-1"></i> View';
-                            buttonGroup.appendChild(viewBtn);
-                            
-                            certificateDiv.appendChild(buttonGroup);
-                            imageContainer.appendChild(certificateDiv);
-                        }
-                    }
-                    
-                    // Show the modal using Bootstrap API
-                    bsModal.show();
-                } catch (error) {
-                    console.error('Error opening modal:', error);
-                }
-            });
-        });
-        
-        // Add click handlers to modal close buttons
-        const closeButtons = achievementModal.querySelectorAll('[data-bs-dismiss="modal"]');
-        closeButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                try {
-                    bsModal.hide();
-                } catch (error) {
-                    console.error('Error closing modal:', error);
-                    
-                    // Fallback manual close if Bootstrap API fails
-                    achievementModal.classList.remove('show');
-                    achievementModal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
-                    
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.parentNode.removeChild(backdrop);
-                }
-            });
-        });
-        
-        // Add click handler to the modal backdrop
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal') || e.target.classList.contains('modal-backdrop')) {
-                try {
-                    bsModal.hide();
-                } catch (error) {
-                    console.error('Error closing modal via backdrop:', error);
-                }
-            }
-        });
-        
-        // Add ESC key handler
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.body.classList.contains('modal-open')) {
-                try {
-                    bsModal.hide();
-                } catch (error) {
-                    console.error('Error closing modal via ESC key:', error);
-                }
-            }
-        });
-    }
-    
     // Call setup functions
-    setupNavigation();
+    // setupNavigation(); // Navigation is now handled in layout.html
     setupIntersectionObserver();
     setupContactForm();
     setupImageErrorHandling();
@@ -697,6 +390,62 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.add('light-theme');
             themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
         }
+    }
+    
+    // Skills filter functionality
+    function initializeSkillsSection() {
+        // Animate skill tags when in view
+        const animateSkillTags = () => {
+            const skillTags = document.querySelectorAll('.skill-tag');
+            skillTags.forEach((tag, index) => {
+                // Apply a staggered animation delay
+                setTimeout(() => {
+                    tag.style.opacity = '1';
+                    tag.style.transform = 'translateY(0)';
+                }, 50 + (index * 30));
+            });
+        };
+        
+        // Use Intersection Observer to check when skills section is visible
+        const skillsSection = document.getElementById('skills');
+        if (skillsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateSkillTags();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+            
+            observer.observe(skillsSection);
+            
+            // Set initial state for animation
+            const skillTags = document.querySelectorAll('.skill-tag');
+            skillTags.forEach(tag => {
+                tag.style.opacity = '0';
+                tag.style.transform = 'translateY(20px)';
+                tag.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            });
+        }
+    }
+    
+    /**
+     * Initialize achievement filters
+     * Note: We no longer need this function as we removed the filters
+     * Keeping an empty function for compatibility with existing code
+     */
+    function initializeAchievementFilters() {
+        // Function intentionally left empty as filters were removed
+    }
+    
+    /**
+     * Initialize event filters
+     * Note: We no longer need this function as we removed the events section
+     * Keeping an empty function for compatibility with existing code
+     */
+    function initializeEventFilters() {
+        // Function intentionally left empty as events section was removed
     }
 }); 
 

@@ -53,22 +53,22 @@
                         <a class="nav-link" href="{{ url_for('index') }}#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='skills') }}">Skills</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#skills">Skills</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='projects') }}">Projects</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#projects">Projects</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='achievements') }}">Achievements</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#achievements">Achievements</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='education') }}">Education</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#education">Education</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('blog') }}">Blog</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index', _anchor='contact') }}">Contact</a>
+                        <a class="nav-link" href="{{ url_for('index') }}#contact">Contact</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -148,28 +148,180 @@
     
     {% block extra_js %}{% endblock %}
     <script>
-        document.querySelectorAll('a.nav-link').forEach(link => {
-          link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href.startsWith('#')) {
-              e.preventDefault();
-              const target = document.querySelector(href);
-              if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-              }
+        // Handle navigation links for both direct sections and returning to homepage sections
+        document.addEventListener('DOMContentLoaded', function() {
+            // Skip section handling if not on the homepage or if viewing an achievement page
+            const isAchievementPage = window.location.pathname.includes('/achievement/');
+            const isHomePage = window.location.pathname === '/' || window.location.pathname === '/index';
+            
+            if (isHomePage && !isAchievementPage) {
+                const sections = document.querySelectorAll('section[id]');
+                
+                // Hide all sections except the hero section on initial load
+                sections.forEach(section => {
+                    if (section.id !== 'hero') {
+                        section.style.display = 'none';
+                    }
+                });
+                
+                // Show section based on hash if present
+                if (window.location.hash) {
+                    const targetId = window.location.hash.substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        // Hide all sections
+                        sections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // Show only the target section
+                        targetSection.style.display = 'block';
+                        
+                        // Smooth scroll to the section
+                        setTimeout(() => {
+                            window.scrollTo({
+                                top: targetSection.offsetTop - 70, // Adjust for navbar height
+                                behavior: 'smooth'
+                            });
+                        }, 100);
+                        
+                        // Update active state in navbar
+                        document.querySelectorAll('.nav-link').forEach(navLink => {
+                            navLink.classList.remove('active');
+                            if (navLink.getAttribute('href').includes('#' + targetId)) {
+                                navLink.classList.add('active');
+                            }
+                        });
+                    }
+                }
+                
+                // Handle links when already on home page (smooth scrolling)
+                document.querySelectorAll('a.nav-link[href^="{{ url_for("index") }}#"], a[href^="#"]').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // Only handle links that point to sections
+                        if (!this.getAttribute('href').includes('#')) return;
+                        
+                        const hashPart = this.getAttribute('href').split('#')[1];
+                        if (!hashPart) return;
+                        
+                        const targetSection = document.getElementById(hashPart);
+                        
+                        if (targetSection) {
+                            e.preventDefault(); // Prevent default jump
+                            
+                            // Hide all sections with fade-out effect
+                            sections.forEach(section => {
+                                if (section !== targetSection) {
+                                    section.classList.add('section-fade-out');
+                                    setTimeout(() => {
+                                        section.style.display = 'none';
+                                        section.classList.remove('section-fade-out');
+                                    }, 300);
+                                }
+                            });
+                            
+                            // Show the target section with fade-in effect
+                            targetSection.style.opacity = '0';
+                            targetSection.style.display = 'block';
+                            setTimeout(() => {
+                                targetSection.classList.add('section-fade-in');
+                                targetSection.style.opacity = '1';
+                                
+                                // Smooth scroll to the TOP of the section
+                                window.scrollTo({
+                                    top: targetSection.offsetTop - 70, // Adjust for navbar height
+                                    behavior: 'smooth'
+                                });
+                            }, 50);
+                            
+                            // Update active state in navbar
+                            document.querySelectorAll('.nav-link').forEach(navLink => {
+                                navLink.classList.remove('active');
+                            });
+                            if (this.classList.contains('nav-link')) {
+                                this.classList.add('active');
+                            }
+                            
+                            // Close mobile navbar if open
+                            const navbarCollapse = document.querySelector('.navbar-collapse');
+                            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                                document.querySelector('.navbar-toggler').click();
+                            }
+                            
+                            // Update URL hash without scrolling
+                            history.pushState(null, null, '#' + hashPart);
+                        }
+                    });
+                });
             }
-          });
-        });
-        document.querySelectorAll('a.nav-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-              const href = this.getAttribute('href');
-              if (href.startsWith('/#') && window.location.pathname !== '/') {
-                e.preventDefault();
-                window.location.href = href;
-              }
+            
+            // Highlight active nav item based on current page
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                const href = link.getAttribute('href').split('#')[0];
+                if (href === currentPath || 
+                    (currentPath === '/' && href === '') || 
+                    (currentPath === '/' && link.getAttribute('href').includes('#'))) {
+                    link.classList.add('active');
+                }
             });
-          });
-      </script>
-      
+            
+            // Update active link on hash change
+            window.addEventListener('hashchange', function() {
+                if (window.location.pathname === '/' || window.location.pathname === '') {
+                    const hash = window.location.hash.substring(1);
+                    if (hash) {
+                        const sections = document.querySelectorAll('section[id]');
+                        
+                        // Hide all sections with fade-out effect
+                        sections.forEach(section => {
+                            if (section.id !== hash) {
+                                section.classList.add('section-fade-out');
+                                setTimeout(() => {
+                                    section.style.display = 'none';
+                                    section.classList.remove('section-fade-out');
+                                }, 300);
+                            }
+                        });
+                        
+                        // Show only the target section with fade-in effect
+                        const targetSection = document.getElementById(hash);
+                        if (targetSection) {
+                            targetSection.style.opacity = '0';
+                            targetSection.style.display = 'block';
+                            setTimeout(() => {
+                                targetSection.classList.add('section-fade-in');
+                                targetSection.style.opacity = '1';
+                                
+                                // Smooth scroll to the TOP of the section
+                                window.scrollTo({
+                                    top: targetSection.offsetTop - 70, // Adjust for navbar height
+                                    behavior: 'smooth'
+                                });
+                            }, 50);
+                        
+                            // Update active nav link
+                            document.querySelectorAll('.nav-link').forEach(navLink => {
+                                navLink.classList.remove('active');
+                                if (navLink.getAttribute('href').includes('#' + hash)) {
+                                    navLink.classList.add('active');
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    <style>
+        .section-fade-in {
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .section-fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
 </body>
 </html> 
